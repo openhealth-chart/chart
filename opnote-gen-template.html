@@ -24,7 +24,7 @@
 
 <body style="background: linear-gradient(9deg, rgba(0,0,0,0.12) 0%, white 100%), url(&quot;{{assetsUriBase}}/assets/img/DALL-E-OR.webp&quot;);">
     <p style="text-align: center;color: var(--bs-emphasis-color);background: var(--bs-body-bg);">Disclaimer: This is a demonstration application. Do not use actual patient information!</p>
-    <h2>Opnote: {{context.patient.names[0].last}},{{context.patient.name[0].given[0]}}-{{context.patient.id}}</h2>
+    <h2>Opnote: {{context.patient.name.[0].family}},{{context.patient.name.[0].given.[0]}}-{{context.patient.id}}</h2>
     <form>
           <label class="form-label" for="#op-date">Operative Date</label>
         <input class="form-control" id="op-date" style="color: var(--bs-emphasis-color);" name="op-date" type="date">
@@ -110,7 +110,7 @@
 });
            // Initialize the height of the textarea
            indications.style.height = indications.scrollHeight + 'px';
-           procedures.style.height = procedure.scrollHeight + 'px';
+           procedures.style.height = procedures.scrollHeight + 'px';
            description.style.height = description.scrollHeight + 'px';
         </script>
    
