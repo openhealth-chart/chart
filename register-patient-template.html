@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en" style="background: url(&quot;https://cdn.bootstrapstudio.io/placeholders/1400x800.png&quot;);">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Opnote-Generator</title>
+    <meta name="description" content="Opnote Generator">
+    <link rel="stylesheet" href="{{assetsUriBase}}/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli&amp;display=swap">
+</head>
+
+<body style="background: var(--bs-dark-bg-subtle);">
+    <p style="text-align: center;color: var(--bs-emphasis-color);background: var(--bs-body-bg);">Disclaimer: This is a demonstration application. Do not use actual patient information!</p>
+    <h1>Patient Registration: {{patientId}}</h1>
+    <form id="submitForm">
+        <!--<input type="hidden" id="patientId" value="{{context.patientId}}" />-->
+        <label class="form-label" for="#lastName">Last Name</label>
+        <input class="form-control" type="text" id="lastName" name="lastName" style="color: var(--bs-emphasis-color);">
+        <label class="form-label" for="#firstName">First Name</label>
+        <input class="form-control" type="text" id="firstName" name="firstName">
+        <label class="form-label" for="#dob">DOB</label>
+        <input class="form-control" id="dob" type="date" name="dob">
+        <input class="btn btn-primary" type="submit" id="formSubmit">
+    </form>
+    <script src="{{assetsUriBase}}/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{assetsUriBase}}/assets/js/new-age.js"></script>
+    <script>
+        //let authorizationHeader = null;
+        //let taskHeader = null;
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('submitForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries()); // Convert FormData to JSON object
+            console.log("submitting to {{location}}:",formData);
+            const baseUrl = window.location.origin + window.location.pathname;
+            const result = fetch('{{location}}', {
+                method: 'POST',
+                headers: {
+                    'Authorization':  'Bearer {{accessToken}}', //authorizationHeader, //
+                    'X-Chart-Task' : '{{context.taskId}}', //taskHeader, 
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                // Update the headers
+                authorizationHeader = response.headers.get('Authorization');
+                taskHeader = response.headers.get('X-Chart-Task');
+                console.log("auth:",authorizationHeader);
+                 // Return the response as text/html
+                 return response.text();
+             })
+            .then(html => {
+             // Replace the entire document with the returned HTML
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => console.error('Error:', error));
+         });
+        });
+        </script>
+</body>
+
+</html>
