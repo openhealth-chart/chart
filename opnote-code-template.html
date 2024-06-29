@@ -79,6 +79,7 @@
         <tbody>
             {{#each context.AICoding.icd10_codes}}
             <tr>
+                <td><input type="checkbox" name="icd10_codes" value="{{this.code}}" checked></td>
                 <td>{{this.code}}</td>
                 <td>{{this.description}}</td>
             </tr>
@@ -95,6 +96,7 @@
             <tbody>
                 {{#each context.AICoding.cpt_codes}}
                 <tr>
+                    <td><input type="checkbox" name="cpt_codes" value="{{this.code}}" checked></td>
                     <td>{{this.code}}</td>
                     <td>{{this.description}}</td>
                 </tr>
@@ -163,7 +165,13 @@ function submitForm(form, url) {
     const procedures = document.getElementById('procedures');
     const proceduresList = procedures.value.split(/[\n,]/).filter(line => line.trim() !== '');
     data.procedures = (proceduresList.length > 1) ? proceduresList : [data.procedures];
-    
+// Collect selected ICD10 and CPT codes
+    const selectedICD10Codes = Array.from(document.querySelectorAll('input[name="icd10_codes"]:checked')).map(checkbox => checkbox.value);
+    const selectedCPTCodes = Array.from(document.querySelectorAll('input[name="cpt_codes"]:checked')).map(checkbox => checkbox.value);
+
+    data.icd10_codes = selectedICD10Codes;
+    data.cpt_codes = selectedCPTCodes;
+   
     console.log("submitting to " + url + ":", JSON.stringify(data));
     document.body.classList.add('loading');
 
