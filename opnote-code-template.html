@@ -114,6 +114,11 @@
          </form>
     </details>  
     <form id="submitForm">
+        <select id="action" name="action">
+            <option value="recode" selected>Edit and Recode</option>
+            <option value="pend">Pend</option>
+            <option value="finalize">Finalize and sign</option>
+        </select>
           <label class="form-label" for="op_date">Operative Date</label>
         <input class="form-control" id="op_date" style="color: var(--bs-emphasis-color);" name="op_date" type="date" value="{{body.op_date}}">
           <label class="form-label" for="surgeon">Surgeon</label>
