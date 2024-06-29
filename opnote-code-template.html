@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="en" style="background: url(&quot;https://cdn.bootstrapstudio.io/placeholders/1400x800.png&quot;);">
+<html data-bs-theme="light" lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -32,6 +32,7 @@
     justify-content: center;
     align-items: center;
     font-size: 2em;
+    z-index: 1000;
       }
       details {
             margin: 1em 0;
@@ -43,6 +44,22 @@
         summary {
             cursor: pointer;
             font-weight: bold;
+        }
+        .conversation {
+            max-width: fit-content;
+            margin: 20px auto;
+        }
+        .question, .response {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .question {
+            background-color: #f1f1f1;
+        }
+        .response {
+            background-color: #e1f5fe;
         }
     </style>
 </head>
@@ -88,12 +105,11 @@
     <p>{{context.AICoding.comment}}</p>
     <details>
         <summary>Click to ask a coding question</summary>
-        <p>
+        <div class="conversation" id="conversation"></div>
          <form id="codingSubmit">
             <textarea id="codingQuestion" name="codingQuestion" rows="1" placeholder="Ask a coding question"></textarea>
             <input class="btn btn-primary" type="submit">
          </form>
-        </p>
     </details>  
     <form id="submitForm">
           <label class="form-label" for="op_date">Operative Date</label>
@@ -180,6 +196,14 @@ function submitCodingQuestion(form, url) {
     const data = Object.fromEntries(formData.entries());
     
     console.log("submitting to " + url + ":", JSON.stringify(data));
+    const conversation = document.getElementById('conversation');
+
+// Append user's question
+    const questionElement = document.createElement('p');
+    questionElement.className = 'question';
+    questionElement.textContent = form.codingQuestion.value;
+    conversation.appendChild(questionElement);
+    document.getElementById('codingQuestion').value = '';
     document.body.classList.add('loading');
 
     fetch(url, {
@@ -197,7 +221,7 @@ function submitCodingQuestion(form, url) {
         const responseElement = document.createElement('p');
         responseElement.className = 'response';
         responseElement.textContent = responseText;
-        form.appendChild(responseElement);
+        conversation.appendChild(responseElement);
     })
     .catch(error => {
         console.error('Error:', error);
