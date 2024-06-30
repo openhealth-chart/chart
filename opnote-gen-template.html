@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Opnote-Generator</title>
+    <meta name="description" content="Opnote Generator">
+    <link rel="stylesheet" href="{{assetsUriBase}}/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli&amp;display=swap">
+    <style>
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: none;
+            overflow: hidden;
+        };
+        body.loading::after {
+    content: 'Loading...';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+      }
+      details {
+            margin: 1em 0;
+            border: 1px solid #aaa;
+            padding: 0.5em;
+            border-radius: 0.25em;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body style="background: linear-gradient(9deg, rgba(0,0,0,0.12) 0%, white 100%)">
+    <p style="text-align: center;color: var(--bs-emphasis-color);background: var(--bs-body-bg);">Disclaimer: This is a demonstration application. Do not use actual patient information!</p>
+    <h2>Opnote: {{context.patient.name.[0].family}},{{context.patient.name.[0].given.[0]}}-{{context.patient.id}}</h2>
+    <form id="submitForm">
+          <label class="form-label" for="op_date">Operative Date</label>
+        <input class="form-control" id="op_date" style="color: var(--bs-emphasis-color);" name="op_date" type="date" value="{{body.opdate}}">
+          <label class="form-label" for="surgeon">Surgeon</label>
+        <input class="form-control" type="text" id="surgeon" name="surgeon" value="{{body.surgeon}}">
+          <label class="form-label" for="assistant">Assistant</label>
+        <input class="form-control" type="text" id="assistant" name="assistant" value="{{body.assistant}}">
+          <label class="form-label" for="preop_diagnoses">Pre Operative Diagnoses</label>
+        <input class="form-control" type="text" id="preop_diagnoses" name="preop_diagnoses" value="{{body.preop_diagnoses}}">
+          <label class="form-label" for="postop_diagnoses">Post Operative Diagnoses</label>
+        <input class="form-control" type="text" id="postop_diagnoses" name="postop_diagnoses" value="{{body.postop_diagnoses}}">
+          <label class="form-label" for="procedures">Procedures</label>
+        <textarea id="procedures" name="procedures" rows="1" placeholder="Procedure (one per line)...">{{body.procedures}}</textarea>
+        <label for="ai">
+          <input type="checkbox" id="ai" name="ai">
+          AI example
+        </label><br>
+        <label class="form-label" for="anaethesia">Anaesthesia</label>
+        <select id="anaesthesia" name="anaesthesia">
+            <option value="general">General Anaesthesia</option>
+            <option value="local">Local Anaesthesia</option>
+            <option value="regional">Regional Anaesthesia</option>
+            <option value="sedation">Sedation</option>
+        </select><br>
+          <label class="form-label" for="indications">Indications</label>
+        <textarea id="indications" name="indications" rows="4" placeholder="Indications ...">{{body.indications}}</textarea>
+          <label class="form-label" for="description">Description of Procedure</label>
+        <textarea id="description" name="description" rows="6" placeholder="Description of procedure ...">{{body.description}}</textarea>
+        <input class="btn btn-primary" type="submit">
+    </form>
+    <script>
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        document.getElementById('submitForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries()); // Convert FormData to JSON object          
+            const procedures = document.getElementById('procedures');
+            const proceduresList = procedures.value.split(/[\n,]/).filter(line => line.trim() !== '');
+            data.procedures = (proceduresList.length > 1)? proceduresList : [ data.procedures ];
+                  // Show loading indicator
+            document.body.classList.add('loading');
+            var loc = '{{location}}';
+            
+            if (document.getElementById('ai').checked) loc = loc+'opnote-by-procedure-ai';
+            console.log("submitting to:",loc, JSON.stringify(data));
+
+            const result = fetch(loc, {
+                method: 'POST',
+                headers: {
+                    'Authorization':  'Bearer {{accessToken}}', 
+                    'X-Chart-Task' : '{{context.taskId}}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                 // Return the response as text/html
+                 return response.text();
+             })
+            .then(html => {
+             // Replace the entire document with the returned HTML
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+            })
+            .finally(() => {
+            // Hide loading indicator
+            document.body.classList.remove('loading');
+             });
+         });
+
+         const autoResize = (e) => {
+                e.target.style.height = 'auto';
+                e.target.style.height = (e.target.scrollHeight) + 'px';
+            };
+         const textareas = document.querySelectorAll('textarea');
+           textareas.forEach(textarea => {
+                textarea.addEventListener('input', autoResize);
+                // Initialize the height of the textarea
+                textarea.style.height = textarea.scrollHeight + 'px';
+            });
+        
+});
+
+        </script>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{assetsUriBase}}/js/new-age.js"></script>
+</body>
+
+</html>

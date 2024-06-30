@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Opnote-Generator</title>
+    <meta name="description" content="Opnote Generator">
+    <link rel="stylesheet" href="{{assetsUriBase}}/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli&amp;display=swap">
+
+       <!-- <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <script src="https://unpkg.com/aws-amplify@5.0.4/dist/aws-amplify.min.js"></script>
+-->
+</head>
+
+<body class="text-bg-secondary" style="background: url(&quot;{{assetsUriBase}}/img/g7765c58c2c8a04b4a0a230d8e035d6496aebd5d61bd3c38851bf2f2998502110d2c28001e8fe79dfa5e92d3721f68a077c250cfdc61ddb36304feca744fc1298_640.png&quot;);">
+    <h1 class="text-center">Opnote Generator</h1>
+    <form class="text-center" id="submitForm">
+        <label class="form-label text-center" for="#patiendId">Patiend ID</label>
+        <input class="form-control" type="text" id="patientId" name="patientId">
+        <input class="form-control" type="submit" id="formSubmit">
+    </form>
+    <!-- Include the Cognito Auth SDK -->
+<!--<script src="https://cdn.jsdelivr.net/npm/amazon-cognito-auth-js@1.4.0/dist/amazon-cognito-auth.min.js"></script>-->
+<!--<script>
+    const poolData = {
+        UserPoolId: 'us-east-2_W3ImeEEKx', // Your user pool id here
+        ClientId: '5135n97oo2769po5lnc9998bui' // Your client id here
+    };
+    const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+    const authData = {
+        ClientId: '5135n97oo2769po5lnc9998bui', // Your client id here
+        AppWebDomain: 'chart.auth.us-east-2.amazoncognito.com',
+        TokenScopesArray: ['openid', 'email'],
+        RedirectUriSignIn: 'https://vukkr5bixf.execute-api.us-east-2.amazonaws.com/initial/auth',
+        //RedirectUriSignOut: 'https://yourapp.com/signout',
+        UserPoolId: 'us-east-2_W3ImeEEKx'
+    };
+    const auth = new AmazonCognitoIdentity.CognitoAuth(authData);
+    
+    // Sign-in user
+    auth.userhandler = {
+        onSuccess: function(result) {
+            console.log("Sign-in success: " + result);
+            const idToken = result.getIdToken().getJwtToken();
+            const accessToken = result.getAccessToken().getJwtToken();
+            
+            // Store the tokens (in a cookie or local storage)
+            localStorage.setItem('idToken', idToken);
+            localStorage.setItem('accessToken', accessToken);
+
+            // Call your API with the tokens
+            callApi(idToken, accessToken);
+        },
+        onFailure: function(err) {
+            console.error("Error: " + err);
+        }
+    };
+
+    // Check for current session
+    auth.getSession();
+</script>
+<script>
+    function callApi(idToken, accessToken) {
+        document.getElementById('submitForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries()); // Convert FormData to JSON object
+
+            fetch({{location}}, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                // Handle the response
+                return response.text();
+            })
+            .then(html => {
+                // Replace the entire document with the returned HTML
+                document.open();
+                document.write(html);
+                document.close();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // Get tokens from local storage
+        const idToken = localStorage.getItem('idToken');
+        const accessToken = localStorage.getItem('accessToken');
+
+        // Call the API if tokens are available
+        if (idToken && accessToken) {
+            callApi(idToken, accessToken);
+        } else {
+            // Redirect to sign-in page if tokens are not available
+            auth.getSession();
+        }
+    });
+</script>-->
+    <script>
+        let authorizationHeader = null;
+        let taskHeader = null;
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.getElementById('submitForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries()); // Convert FormData to JSON object
+                console.log("submitting to {{location}}:",formData);
+                const baseUrl = window.location.origin + window.location.pathname;
+                const result = fetch('{{location}}', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization':  'Bearer {{accessToken}}', //authorizationHeader, //
+                        'X-Chart-Task' : '{{taskId}}', //taskHeader, 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => {
+                    // Update the headers
+                    authorizationHeader = response.headers.get('Authorization');
+                    taskHeader = response.headers.get('X-Chart-Task');
+                    //console.log("auth:",authorizationHeader);
+                     // Return the response as text/html
+                     return response.text();
+                 })
+                .then(html => {
+                 // Replace the entire document with the returned HTML
+                    document.open();
+                    document.write(html);
+                    document.close();
+                })
+                .catch(error => console.error('Error:', error));
+             });
+            });
+    </script>
+
+    <script src="{{assetsUriBase}}/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{assetsUriBase}}/js/new-age.js"></script>
+</body>
+
+</html>
