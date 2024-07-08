@@ -197,11 +197,15 @@ function showLoading() {
 function hideLoading() {
     document.getElementById('loading-overlay').style.display = 'none';
     }
+document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('focus', () => {
+          transcriptTextarea = textarea;
+        });
+      });
 document.addEventListener('DOMContentLoaded', (event) => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
     textarea.addEventListener('input', autoResize);
-    textarea.addEventListener('onfocus', focusTextArea)
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
     });
@@ -211,7 +215,4 @@ function autoResize(e) {
         e.target.style.height = (e.target.scrollHeight) + 'px';
         e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
     }
-function focusTextArea(e) {
-    transcriptTextarea = e.target;
-}
 }
