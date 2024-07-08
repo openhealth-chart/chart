@@ -1,4 +1,4 @@
-function chartRecorderInit(key) {
+function chartRecorderInit(key,pause = 600) {
   const apiKey = key;
 
   const startButton = document.getElementById('start-recognition');
@@ -12,10 +12,10 @@ function chartRecorderInit(key) {
   let audioSource;
   let silenceTimeout;
   let stream;
-  const silenceDelay = 1200; // 1.2 seconds of silence
+  const silenceDelay = pause; // 1.2 seconds of silence
 
-  startButton.addEventListener('click', startRecording);
-  stopButton.addEventListener('click', stopRecording);
+  if (startButton) startButton.addEventListener('click', startRecording);
+  if (stopButton) stopButton.addEventListener('click', stopRecording);
   // start with first
   let currentTextarea;
 
@@ -208,7 +208,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     textarea.addEventListener('input', autoResize);
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
-    currentTextArea = document.querySelector('textarea'); // Default to first textarea
+    currentTexta
+    rea = document.querySelector('textarea'); // Default to first textarea
 
     // Add event listeners to all textareas to track the current one
     document.querySelectorAll('textarea').forEach(textarea => {
