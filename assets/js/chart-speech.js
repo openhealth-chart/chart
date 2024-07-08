@@ -194,6 +194,7 @@ function chartRecorderInit(key,pause = 600) {
     currentTextarea.value = before + text + after;
     currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
     currentTextarea.focus();
+    handleSpeechToText();
   }
 function showLoading() {
     document.getElementById('loading-overlay').style.display = 'flex';
@@ -206,9 +207,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
     textarea.addEventListener('input', autoResize);
+    textarea.addEventListener('focus', handleFocus);
+    textarea.addEventListener('blur', handleBlur);
+
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
-    currentTexta
     rea = document.querySelector('textarea'); // Default to first textarea
 
     // Add event listeners to all textareas to track the current one
@@ -219,6 +222,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
     });
 });
+function setFuzzyOutline(color) {
+  currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
+}
+
+function removeFuzzyOutline() {
+  currentTextarea.style.boxShadow = 'none';
+}
+
+function handleFocus() {
+  setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+}
+
+function handleBlur() {
+  removeFuzzyOutline();
+}
+function handleSpeechToText() {
+  setFuzzyOutline('rgba(255, 0, 0, 0.5)'); // Semi-transparent blue
+}
 function autoResize(e) {
         e.target.style.height = 'auto';
         e.target.style.height = (e.target.scrollHeight) + 'px';
