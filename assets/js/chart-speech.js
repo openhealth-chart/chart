@@ -1,11 +1,12 @@
 
 let apiKey = null;
-export class ChartRecording{
+export class ChartRecorder{
     constructor(key){
         this.key=key;
         apiKey = key;
+        initialize();
     }
-}
+initialize() {
 const startButton = document.getElementById('start-recognition');
 const stopButton = document.getElementById('stop-recognition');
 const transcriptTextarea = document.getElementById('transcript');
@@ -191,3 +192,4 @@ function insertTextAtCursor(textarea, text) {
   textarea.selectionStart = textarea.selectionEnd = start + text.length;
   textarea.focus();
 }
+}}
