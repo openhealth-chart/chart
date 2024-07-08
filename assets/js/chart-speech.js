@@ -334,6 +334,7 @@ function autoResize(e) {
 }
 async function sendPdfToGoogleCloudOcr(pdfFile) {
   // Base64 encode the PDF file
+  const debugDiv = document.getElementById('debug');
   const fileReader = new FileReader();
   const base64EncodedPdf = await new Promise((resolve) => {
     if (debugDiv) debugDiv.innerHTML += 'starting file read<br>';
@@ -377,7 +378,7 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
     const result = await response.json();
     return extractTextFromResponse(result);
   } catch (error) {
-    console.error('Error:', error);
+    if (debugDiv) debugDiv.innerHTML += error.message;
     throw error;
   }
 }
