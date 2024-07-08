@@ -332,6 +332,8 @@ function autoResize(e) {
  // Function to send PDF to Google Cloud Vision OCR
 
 }
+// THIS IS CLAUDE BUT DOESN'T WORK
+/*
 async function sendPdfToGoogleCloudOcr(pdfFile,apiKey) {
   // Base64 encode the PDF file
   const fileReader = new FileReader();
@@ -392,3 +394,68 @@ function extractTextFromResponse(apiResponse) {
   });
   return extractedText;
 }
+  */
+
+// THIS IS CHATGPT'S version
+async function sendPdfToGoogleCloudOcr(pdfFile, apiKey) {
+  // Base64 encode the PDF file
+  const fileReader = new FileReader();
+  const base64EncodedPdf = await new Promise((resolve, reject) => {
+    fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
+    fileReader.onerror = error => reject(error);
+    fileReader.readAsDataURL(pdfFile);
+  });
+
+  // Prepare the request body
+  const requestBody = {
+    requests: [
+      {
+        inputConfig: {
+          mimeType: 'application/pdf',
+          content: base64EncodedPdf
+        },
+        features: [
+          {
+            type: 'DOCUMENT_TEXT_DETECTION'
+          }
+        ]
+      }
+    ]
+  };
+
+  // Send the request to Google Cloud Vision API
+  try {
+    const response = await fetch(`https://vision.googleapis.com/v1/files:annotate?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return extractTextFromResponse(result);
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
+}
+
+// Helper function to extract text from the API response
+function extractTextFromResponse(apiResponse) {
+  let extractedText = '';
+  if (apiResponse.responses) {
+    apiResponse.responses.forEach(response => {
+      if (response.fullTextAnnotation) {
+        extractedText += response.fullTextAnnotation.text + '\n';
+      }
+    });
+  }
+  return extractedText;
+}
+
+
