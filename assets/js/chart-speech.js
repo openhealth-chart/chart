@@ -390,16 +390,4 @@ function extractTextFromResponse(apiResponse) {
   });
   return extractedText;
 }
-
-// Usage example
-const pdfInput = document.getElementById('pdfInput');
-pdfInput.addEventListener('change', async (event) => {
-  const pdfFile = event.target.files[0];
-  try {
-    const extractedText = await sendPdfToGoogleCloudOcr(pdfFile);
-    if (debugDiv) debugDiv.innerHTML += 'Extracted text:'+ extractedText;
-  } catch (error) {
-    console.error('Failed to extract text:', error);
-  }
-});
 }
