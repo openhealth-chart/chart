@@ -89,3 +89,46 @@ summary {
     max-width: 200px;
     z-index: 1000;
   }
+  #start-recognition, #stop-recognition {
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  #start-recognition {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  #start-recognition:hover {
+    background-color: #45a049;
+  }
+  
+  #stop-recognition {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  #stop-recognition:hover {
+    background-color: #da190b;
+  }
+  
+  #start-recognition:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }

@@ -3,6 +3,7 @@ function chartRecorderInit(key,pause = 600) {
 
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
+
   const debugDiv = document.getElementById('debug');
   let mediaRecorder;
   let isRecording = false;
@@ -21,6 +22,10 @@ function chartRecorderInit(key,pause = 600) {
 
   function startRecording() {
     if (isRecording) return;
+    isRecording = true;
+    if (startButton) startButton.disabled = true;
+    if (stopButton) stopButton.disabled = false;
+  
     isRecording = true;
     audioChunks = [];
 
@@ -87,6 +92,8 @@ function chartRecorderInit(key,pause = 600) {
   function stopRecording() {
     if (!isRecording) return;
     isRecording = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
       mediaRecorder.stop();
     }
@@ -97,6 +104,7 @@ function chartRecorderInit(key,pause = 600) {
       stream.getTracks().forEach(track => track.stop());
     }
     sendAudioChunks(); // Process any remaining audio in the buffer
+    stopPulsating();
     const micIcon = document.getElementById('mic-icon');
     if (micIcon) {
       micIcon.classList.add('hidden');
@@ -267,6 +275,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     // Add event listeners to all textareas to track the current one
     });
+    if (stopButton) stopButton.disabled = true;
+
 });
 function setFuzzyOutline(color) {
   currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
