@@ -6,7 +6,8 @@ function chartRecorderInit(key) {
 
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
-  const transcriptTextarea = document.getElementById('transcript');
+  //start with first textarea
+  const transcriptTextarea = document.querySelector('textarea');
   const debugDiv = document.getElementById('debug');
   let mediaRecorder;
   let isRecording = false;
@@ -180,7 +181,7 @@ function chartRecorderInit(key) {
     });
   }
 
-  function insertTextAtCursor(textarea, text) {
+function insertTextAtCursor(textarea, text) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const before = textarea.value.substring(0, start);
@@ -189,4 +190,28 @@ function chartRecorderInit(key) {
     textarea.selectionStart = textarea.selectionEnd = start + text.length;
     textarea.focus();
   }
+function showLoading() {
+    document.getElementById('loading-overlay').style.display = 'flex';
+    }
+
+function hideLoading() {
+    document.getElementById('loading-overlay').style.display = 'none';
+    }
+document.addEventListener('DOMContentLoaded', (event) => {
+    const textareas = document.querySelectorAll('textarea');
+    textareas.forEach(textarea => {
+    textarea.addEventListener('input', autoResize);
+    textarea.addEventListener('click', selectedTextArea)
+// Call autoResize immediately to set initial height
+    autoResize({ target: textarea });
+    });
+});
+function autoResize(e) {
+        e.target.style.height = 'auto';
+        e.target.style.height = (e.target.scrollHeight) + 'px';
+        e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
+    }
+function selectedTextArea(e) {
+    transcriptTextArea = e.target;
+}
 }
