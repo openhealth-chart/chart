@@ -7,7 +7,7 @@ function chartRecorderInit(key) {
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
   //start with first textarea
-  const transcriptTextarea = document.querySelector('textarea');
+  let transcriptTextarea = document.querySelector('textarea');
   const debugDiv = document.getElementById('debug');
   let mediaRecorder;
   let isRecording = false;
