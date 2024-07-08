@@ -1,7 +1,7 @@
 // Declare a global variable for the API key
 let apiKey = null;
 
-function charRecorderInit(key) {
+function chartRecorderInit(key) {
   apiKey = key;
 
   const startButton = document.getElementById('start-recognition');
@@ -190,5 +190,4 @@ function charRecorderInit(key) {
     textarea.focus();
   }
 }
-
 export { chartRecorderInit };
