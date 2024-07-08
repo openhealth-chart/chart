@@ -1,13 +1,8 @@
-// Declare a global variable for the API key
-let apiKey = null;
-
 function chartRecorderInit(key) {
-  apiKey = key;
+  const apiKey = key;
 
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
-  //start with first textarea
-  let transcriptTextarea = document.querySelector('textarea');
   const debugDiv = document.getElementById('debug');
   let mediaRecorder;
   let isRecording = false;
@@ -21,6 +16,8 @@ function chartRecorderInit(key) {
 
   startButton.addEventListener('click', startRecording);
   stopButton.addEventListener('click', stopRecording);
+  // start with first
+  let currentTextarea;
 
   function startRecording() {
     if (isRecording) return;
@@ -59,6 +56,12 @@ function chartRecorderInit(key) {
         };
 
         mediaRecorder.start();
+        // Focus on the current textarea after a short delay
+        setTimeout(() => {
+            if (currentTextarea) {
+              currentTextarea.focus();
+            }
+          }, 100);
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
@@ -162,7 +165,7 @@ function chartRecorderInit(key) {
               if (result.alternatives && result.alternatives.length > 0) {
                 const transcript = result.alternatives[0].transcript;
                 if (transcript) {
-                  insertTextAtCursor(transcriptTextarea, transcript + ' ');
+                  insertTextAtCursor(transcript + ' ');
                   if (debugDiv) debugDiv.innerHTML += 'Transcribed: ' + transcript + '<br>';
                 }
               }
@@ -181,14 +184,16 @@ function chartRecorderInit(key) {
     });
   }
 
-function insertTextAtCursor(textarea, text) {
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const before = textarea.value.substring(0, start);
-    const after = textarea.value.substring(end, textarea.value.length);
-    textarea.value = before + text + after;
-    textarea.selectionStart = textarea.selectionEnd = start + text.length;
-    textarea.focus();
+  function insertTextAtCursor(text) {
+    if (!currentTextarea) return;
+    
+    const start = currentTextarea.selectionStart;
+    const end = currentTextarea.selectionEnd;
+    const before = currentTextarea.value.substring(0, start);
+    const after = currentTextarea.value.substring(end, currentTextarea.value.length);
+    currentTextarea.value = before + text + after;
+    currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
+    currentTextarea.focus();
   }
 function showLoading() {
     document.getElementById('loading-overlay').style.display = 'flex';
@@ -197,17 +202,20 @@ function showLoading() {
 function hideLoading() {
     document.getElementById('loading-overlay').style.display = 'none';
     }
-document.querySelectorAll('textarea').forEach(textarea => {
-        textarea.addEventListener('focus', () => {
-          transcriptTextarea = textarea;
-        });
-      });
 document.addEventListener('DOMContentLoaded', (event) => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
     textarea.addEventListener('input', autoResize);
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
+    currentTextArea = document.querySelector('textarea'); // Default to first textarea
+
+    // Add event listeners to all textareas to track the current one
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('focus', () => {
+            currentTextarea = textarea;
+        });
+    });
     });
 });
 function autoResize(e) {
