@@ -51,3 +51,41 @@ summary {
 .response {
     background-color: #e1f5fe;
 }
+@keyframes pulse {
+  0% { box-shadow: 0 0 8px 3px rgba(255, 0, 0, 0.5); }
+  50% { box-shadow: 0 0 12px 5px rgba(255, 0, 0, 0.7); }
+  100% { box-shadow: 0 0 8px 3px rgba(255, 0, 0, 0.5); }
+}
+
+.pulsating {
+  animation: pulse 1.5s infinite;
+}
+#mic-icon {
+    position: fixed;
+    font-size: 24px;
+    transition: all 0.3s ease;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+  }
+  
+  .bouncing {
+    animation: bounce 2s infinite;
+  }
+  #transcription-bubble {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    max-width: 200px;
+    z-index: 1000;
+  }

@@ -62,6 +62,14 @@ function chartRecorderInit(key,pause = 600) {
               currentTextarea.focus();
             }
           }, 100);
+        const micIcon = document.getElementById('mic-icon');
+        if (micIcon) {
+          micIcon.classList.remove('hidden');
+          micIcon.classList.add('bouncing');
+        }
+
+  // Position the icon near the cursor
+        document.addEventListener('mousemove', updateMicPosition);
       })
       .catch(error => {
         console.error('Error accessing microphone:', error);
@@ -69,7 +77,13 @@ function chartRecorderInit(key,pause = 600) {
         isRecording = false;
       });
   }
-
+  function updateMicPosition(e) {
+    const micIcon = document.getElementById('mic-icon');
+    if (micIcon) {
+      micIcon.style.left = (e.pageX + 10) + 'px';
+      micIcon.style.top = (e.pageY + 10) + 'px';
+    }
+  }
   function stopRecording() {
     if (!isRecording) return;
     isRecording = false;
@@ -83,6 +97,12 @@ function chartRecorderInit(key,pause = 600) {
       stream.getTracks().forEach(track => track.stop());
     }
     sendAudioChunks(); // Process any remaining audio in the buffer
+    const micIcon = document.getElementById('mic-icon');
+    if (micIcon) {
+      micIcon.classList.add('hidden');
+      micIcon.classList.remove('bouncing');
+      document.removeEventListener('mousemove', updateMicPosition);
+    }
   }
 
   function detectSilence() {
@@ -158,13 +178,13 @@ function chartRecorderInit(key,pause = 600) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
-          if (debugDiv) debugDiv.innerHTML += `API Response: ${JSON.stringify(data)}<br>`;
-
+          if (debugDiv) debugDiv.innerHTML += `API Response: ${JSON.stringify(data)}<br>`;  
           if (data.results && data.results.length > 0) {
             data.results.forEach(result => {
               if (result.alternatives && result.alternatives.length > 0) {
                 const transcript = result.alternatives[0].transcript;
                 if (transcript) {
+                  showTranscriptionBubble(transcript);
                   insertTextAtCursor(transcript + ' ');
                   if (debugDiv) debugDiv.innerHTML += 'Transcribed: ' + transcript + '<br>';
                 }
@@ -183,7 +203,30 @@ function chartRecorderInit(key,pause = 600) {
       reader.readAsDataURL(audioBlob);
     });
   }
-
+  function showTranscriptionBubble(text) {
+    const bubble = document.getElementById('transcription-bubble');
+    if (bubble) {
+    bubble.textContent = text;
+    bubble.classList.remove('hidden');
+    
+    // Position the bubble near the cursor
+    document.addEventListener('mousemove', updateBubblePosition);
+    
+    // Hide the bubble after 3 seconds
+    setTimeout(() => {
+      bubble.classList.add('hidden');
+      document.removeEventListener('mousemove', updateBubblePosition);
+    }, 3000);
+    }
+  }
+  
+  function updateBubblePosition(e) {
+    const bubble = document.getElementById('transcription-bubble');
+    if (bubble) {
+    bubble.style.left = (e.pageX + 20) + 'px';
+    bubble.style.top = (e.pageY + 20) + 'px';
+    }
+  }
   function insertTextAtCursor(text) {
     if (!currentTextarea) return;
     
@@ -207,19 +250,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
     textarea.addEventListener('input', autoResize);
-    textarea.addEventListener('focus', handleFocus);
-    textarea.addEventListener('blur', handleBlur);
+    textarea.addEventListener('focus', () => {
+      currentTextarea = textarea;
+      if (isRecording) {
+        handleSpeechToText();
+      } else 
+        setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+    });
+    textarea.addEventListener('blur', () =>{
+      stopPulsating();
+    });
 
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
-    rea = document.querySelector('textarea'); // Default to first textarea
+    currentTextarea = document.querySelector('textarea'); // Default to first textarea
 
     // Add event listeners to all textareas to track the current one
-    document.querySelectorAll('textarea').forEach(textarea => {
-        textarea.addEventListener('focus', () => {
-            currentTextarea = textarea;
-        });
-    });
     });
 });
 function setFuzzyOutline(color) {
@@ -229,16 +275,15 @@ function setFuzzyOutline(color) {
 function removeFuzzyOutline() {
   currentTextarea.style.boxShadow = 'none';
 }
-
-function handleFocus() {
-  setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
-}
-
-function handleBlur() {
-  removeFuzzyOutline();
-}
 function handleSpeechToText() {
-  setFuzzyOutline('rgba(255, 0, 0, 0.5)'); // Semi-transparent blue
+  currentTextarea.classList.add('pulsating');
+  setFuzzyOutline('rgba(255, 0, 0, 0.5)');
+}
+
+// Add this function to stop pulsating
+function stopPulsating() {
+  currentTextarea.classList.remove('pulsating');
+  removeFuzzyOutline();
 }
 function autoResize(e) {
         e.target.style.height = 'auto';
