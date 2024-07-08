@@ -332,12 +332,11 @@ function autoResize(e) {
  // Function to send PDF to Google Cloud Vision OCR
 
 }
-async function sendPdfToGoogleCloudOcr(pdfFile) {
+async function sendPdfToGoogleCloudOcr(pdfFile,apiKey) {
   // Base64 encode the PDF file
-  const debugDiv = document.getElementById('debug');
   const fileReader = new FileReader();
   const base64EncodedPdf = await new Promise((resolve) => {
-    if (debugDiv) debugDiv.innerHTML += 'starting file read<br>';
+    console.log('starting file read');
     fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
     fileReader.readAsDataURL(pdfFile);
   });
@@ -361,7 +360,7 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
 
   // Send the request to Google Cloud Vision API
   try {
-    if (debugDiv) debugDiv.innerHTML += 'sending to Google Vision<br>';
+    console.log('sending to Google Vision<');
     const response = await fetch('https://vision.googleapis.com/v1/files:annotate', {
       method: 'POST',
       headers: {
@@ -374,11 +373,11 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    if (debugDiv) debugDiv.innerHTML += 'returned from  Google Vision<br>';
+    console.log('returned from  Google Vision');
     const result = await response.json();
     return extractTextFromResponse(result);
   } catch (error) {
-    if (debugDiv) debugDiv.innerHTML += error.message;
+    console.error(error.message);
     throw error;
   }
 }
