@@ -329,4 +329,75 @@ function autoResize(e) {
         e.target.style.height = (e.target.scrollHeight) + 'px';
         e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
     }
+ // Function to send PDF to Google Cloud Vision OCR
+async function sendPdfToGoogleCloudOcr(pdfFile) {
+  // Base64 encode the PDF file
+  const fileReader = new FileReader();
+  const base64EncodedPdf = await new Promise((resolve) => {
+    fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
+    fileReader.readAsDataURL(pdfFile);
+  });
+
+  // Prepare the request body
+  const requestBody = {
+    requests: [
+      {
+        inputConfig: {
+          mimeType: 'application/pdf',
+          content: base64EncodedPdf
+        },
+        features: [
+          {
+            type: 'DOCUMENT_TEXT_DETECTION'
+          }
+        ]
+      }
+    ]
+  };
+
+  // Send the request to Google Cloud Vision API
+  try {
+    const response = await fetch('https://vision.googleapis.com/v1/files:annotate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}` // Replace with your actual API key
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return extractTextFromResponse(result);
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+// Helper function to extract text from the API response
+function extractTextFromResponse(apiResponse) {
+  let extractedText = '';
+  apiResponse.responses.forEach(response => {
+    if (response.fullTextAnnotation) {
+      extractedText += response.fullTextAnnotation.text + '\n';
+    }
+  });
+  return extractedText;
+}
+
+// Usage example
+const pdfInput = document.getElementById('pdfInput');
+pdfInput.addEventListener('change', async (event) => {
+  const pdfFile = event.target.files[0];
+  try {
+    const extractedText = await sendPdfToGoogleCloudOcr(pdfFile);
+    console.log('Extracted text:', extractedText);
+  } catch (error) {
+    console.error('Failed to extract text:', error);
+  }
+});
 }
