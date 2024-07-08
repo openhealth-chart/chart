@@ -334,6 +334,7 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
   // Base64 encode the PDF file
   const fileReader = new FileReader();
   const base64EncodedPdf = await new Promise((resolve) => {
+    if (debugDiv) debugDiv.innerHTML += 'starting file read<br>';
     fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
     fileReader.readAsDataURL(pdfFile);
   });
@@ -357,6 +358,7 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
 
   // Send the request to Google Cloud Vision API
   try {
+    if (debugDiv) debugDiv.innerHTML += 'sending to Google Vision<br>';
     const response = await fetch('https://vision.googleapis.com/v1/files:annotate', {
       method: 'POST',
       headers: {
@@ -369,7 +371,7 @@ async function sendPdfToGoogleCloudOcr(pdfFile) {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    if (debugDiv) debugDiv.innerHTML += 'returned from  Google Vision<br>';
     const result = await response.json();
     return extractTextFromResponse(result);
   } catch (error) {
@@ -395,7 +397,7 @@ pdfInput.addEventListener('change', async (event) => {
   const pdfFile = event.target.files[0];
   try {
     const extractedText = await sendPdfToGoogleCloudOcr(pdfFile);
-    console.log('Extracted text:', extractedText);
+    if (debugDiv) debugDiv.innerHTML += 'Extracted text:'+ extractedText;
   } catch (error) {
     console.error('Failed to extract text:', error);
   }
