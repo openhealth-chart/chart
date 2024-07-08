@@ -190,4 +190,3 @@ function chartRecorderInit(key) {
     textarea.focus();
   }
 }
-export { chartRecorderInit };
