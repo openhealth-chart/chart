@@ -330,6 +330,8 @@ function autoResize(e) {
         e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
     }
  // Function to send PDF to Google Cloud Vision OCR
+
+}
 async function sendPdfToGoogleCloudOcr(pdfFile) {
   // Base64 encode the PDF file
   const fileReader = new FileReader();
@@ -389,5 +391,4 @@ function extractTextFromResponse(apiResponse) {
     }
   });
   return extractedText;
-}
 }
