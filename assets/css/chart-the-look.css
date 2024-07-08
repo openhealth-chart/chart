@@ -1,0 +1,53 @@
+body {
+    background: linear-gradient(9deg, rgba(0,0,0,0.12) 0%, white 100%);
+    font-family: 'Lato', sans-serif;
+}
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    transition: height 0.2s ease;
+};
+@media (min-width: 992px) {
+    .custom-width-lg {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    }
+}
+form {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 5px;
+}
+details {
+    margin: 1em 0;
+    border: 2px solid #aaa;
+    padding: 0.5em;
+    border-radius: 0.25em;
+}
+summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+.conversation {
+    max-width: fit-content;
+    margin: 20px auto;
+}
+.question, .response {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+.question {
+    background-color: #f1f1f1;
+}
+.response {
+    background-color: #e1f5fe;
+}
