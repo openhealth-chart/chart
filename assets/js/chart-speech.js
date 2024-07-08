@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const textareas = document.querySelectorAll('textarea');
     textareas.forEach(textarea => {
     textarea.addEventListener('input', autoResize);
-    textarea.addEventListener('click', selectedTextArea)
+    textarea.addEventListener('onfocus', focusTextArea)
 // Call autoResize immediately to set initial height
     autoResize({ target: textarea });
     });
@@ -211,7 +211,7 @@ function autoResize(e) {
         e.target.style.height = (e.target.scrollHeight) + 'px';
         e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
     }
-function selectedTextArea(e) {
-    transcriptTextArea = e.target;
+function focusTextArea(e) {
+    transcriptTextarea = e.target;
 }
 }
