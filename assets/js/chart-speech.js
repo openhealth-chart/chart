@@ -211,30 +211,58 @@ function chartRecorderInit(key,pause = 600) {
       reader.readAsDataURL(audioBlob);
     });
   }
+  let bubbleTimeout;
+
   function showTranscriptionBubble(text) {
     const bubble = document.getElementById('transcription-bubble');
-    if (bubble) {
     bubble.textContent = text;
     bubble.classList.remove('hidden');
     
-    // Position the bubble near the cursor
+    // Clear any existing timeout
+    clearTimeout(bubbleTimeout);
+    
+    // Update bubble position immediately
+    updateBubblePosition();
+    
+    // Add event listener for cursor movement
     document.addEventListener('mousemove', updateBubblePosition);
     
     // Hide the bubble after 3 seconds
-    setTimeout(() => {
+    bubbleTimeout = setTimeout(() => {
       bubble.classList.add('hidden');
       document.removeEventListener('mousemove', updateBubblePosition);
     }, 3000);
-    }
   }
   
   function updateBubblePosition(e) {
     const bubble = document.getElementById('transcription-bubble');
-    if (bubble) {
-    bubble.style.left = (e.pageX + 20) + 'px';
-    bubble.style.top = (e.pageY + 20) + 'px';
+    const rect = currentTextarea.getBoundingClientRect();
+    
+    let x, y;
+    
+    if (e) {
+      // If called from mousemove event
+      x = e.clientX;
+      y = e.clientY;
+    } else {
+      // If called without event (initial positioning)
+      x = rect.left + currentTextarea.selectionStart % currentTextarea.cols * (rect.width / currentTextarea.cols);
+      y = rect.top + Math.floor(currentTextarea.selectionStart / currentTextarea.cols) * (rect.height / currentTextarea.rows);
     }
+    
+    // Adjust position to avoid going off-screen
+    const bubbleRect = bubble.getBoundingClientRect();
+    if (x + bubbleRect.width > window.innerWidth) {
+      x = window.innerWidth - bubbleRect.width;
+    }
+    if (y + bubbleRect.height > window.innerHeight) {
+      y = window.innerHeight - bubbleRect.height;
+    }
+    
+    bubble.style.left = `${x + 20}px`;
+    bubble.style.top = `${y + 20}px`;
   }
+
   function insertTextAtCursor(text) {
     if (!currentTextarea) return;
     
@@ -264,6 +292,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         handleSpeechToText();
       } else 
         setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+      updateBubblePosition(); 
     });
     textarea.addEventListener('blur', () =>{
       stopPulsating();
