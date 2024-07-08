@@ -4,7 +4,7 @@ export class ChartRecorder{
     constructor(key){
         this.key=key;
         apiKey = key;
-        initialize();
+        this.initialize();
     }
 initialize() {
 const startButton = document.getElementById('start-recognition');
