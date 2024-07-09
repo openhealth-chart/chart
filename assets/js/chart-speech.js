@@ -1,4 +1,5 @@
-function chartRecorderInit(key,pause = 600) {
+// following this are functions not related to recording
+function chartRecorderInit(key,pause = 400) {
   const apiKey = key;
 
   const startButton = document.getElementById('start-recognition');
@@ -276,15 +277,6 @@ function chartRecorderInit(key,pause = 600) {
     currentTextarea.focus();
     // redundant handleSpeechToText(currentTextarea);
   }
-function showLoading() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.style.display = 'flex';
-    }
-
-function hideLoading() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.style.display = 'none';
-  }
 
 document.addEventListener('DOMContentLoaded', (event) => {
   // Select all textareas and inputs with 'dict' in their class list
@@ -335,13 +327,6 @@ function stopPulsating(e) {
   removeFuzzyOutline(e);
   }
 }
-function autoResize(e) {
-  if (e.target.tagName.toLowerCase() === 'textarea') {
-    e.target.style.height = 'auto';
-    e.target.style.height = (e.target.scrollHeight) + 'px';
-    e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
-  }
-} // Function to send PDF to Google Cloud Vision OCR
 
 }
 // THIS IS CLAUDE BUT DOESN'T WORK
@@ -407,7 +392,23 @@ function extractTextFromResponse(apiResponse) {
   return extractedText;
 }
   */
+ function autoResize(e) {
+  if (e.target.tagName.toLowerCase() === 'textarea') {
+    e.target.style.height = 'auto';
+    e.target.style.height = (e.target.scrollHeight) + 'px';
+    e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
+  }
+} // Function to send PDF to Google Cloud Vision OCR
 
+function showLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'flex';
+  }
+
+function hideLoading() {
+  const overlay = document.getElementById('loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
 // THIS IS CHATGPT'S version
 async function sendPdfToGoogleCloudOcr(pdfFile, apiKey) {
   // Base64 encode the PDF file
