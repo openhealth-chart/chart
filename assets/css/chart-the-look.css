@@ -1,6 +1,70 @@
 body {
     background: linear-gradient(9deg, rgba(0,0,0,0.12) 0%, white 100%);
     font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+.container {
+    max-width: 90%;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1, h2, h3 {
+    color: #333;
+}
+.section {
+    margin-bottom: 20px;
+}
+.section-title {
+    font-size: 1.2em;
+    color: #007BFF;
+    border-bottom: 2px solid #007BFF;
+    padding-bottom: 5px;
+}
+.section-content {
+    padding: 10px 0;
+    line-height: 1.6;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+table, th, td {
+    border: 1px solid #ddd;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f4f4f9;
+    color: #333;
+}
+.warning {
+    text-align: center;
+    color: var(--bs-emphasis-color);
+    background: var(--bs-body-bg);
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+}
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        padding: 10px;
+    }
+    h1, h2, h3 {
+        font-size: 1.2em;
+    }
+    .section-title {
+        font-size: 1em;
+    }
+    .section-content {
+        font-size: 0.9em;
+    }
 }
 textarea {
     width: 100%;
@@ -132,3 +196,22 @@ summary {
     white-space: nowrap;
     border: 0;
   }
+  .loading-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 9999;
+}
+
+.loading-overlay .loading-text {
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    color: white; 
+    font-size: 24px;
+}
