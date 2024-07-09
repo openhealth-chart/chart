@@ -300,10 +300,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
         setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
         updateBubblePosition();
       }
-    });
+    })
     field.addEventListener('blur', () => {
       removeFuzzyOutline();
-    });
+    })
     field.addEventListener('click', updateBubblePosition);
     field.addEventListener('keyup', updateBubblePosition);
     if (stopButton) stopButton.disabled = true;
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   // Set the default field to the first one in the list
   currentTextarea = dictFields[0] || null;
-});
+})
 function setFuzzyOutline(color) {
   if (currentTextarea) {
     currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
