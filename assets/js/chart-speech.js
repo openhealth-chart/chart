@@ -22,15 +22,21 @@ function chartRecorderInit(key,pause = 400) {
   let currentTextarea;
 
   function startRecording() {
-    if (isRecording) return;
-    isRecording = true;
-    if (startButton) startButton.disabled = true;
-    if (stopButton) stopButton.disabled = false;
-  
-    // If a field is already focused when recording starts, apply speech-to-text styling
-    if (currentTextarea) {
-      handleSpeechToText(currentTextarea);
-    }
+    function startRecording() {
+      if (isRecording) return;
+      isRecording = true;
+      if (startButton) startButton.disabled = true;
+      if (stopButton) stopButton.disabled = false;
+    
+      // If no textarea is currently selected, select the first one
+      if (!currentTextarea) {
+        const dictFields = document.querySelectorAll('textarea.dict, input.dict');
+        if (dictFields.length > 0) {
+          handleFieldActivation(dictFields[0]);
+        }
+      } else {
+        handleSpeechToText(currentTextarea);
+      }
     isRecording = true;
     audioChunks = [];
 
@@ -293,17 +299,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const dictFields = document.querySelectorAll('textarea.dict, input.dict');
 
   dictFields.forEach(field => {
+    field.addEventListener('click', () => {
+        handleFieldActivation(field);
+    });
     field.addEventListener('input', autoResize);
     field.addEventListener('focus', () => {
       handleFieldActivation(field);
     });
     field.addEventListener('blur', () => {
       stopPulsating(field);
-    });
-
-    // Add this new click event listener
-    field.addEventListener('click', () => {
-      handleFieldActivation(field);
     });
     field.addEventListener('keyup', updateBubblePosition);
     // Call autoResize immediately to set initial height (only for textareas)
@@ -339,6 +343,8 @@ function handleSpeechToText(field) {
   if (field) {
     field.classList.add('pulsating');
     setFuzzyOutline(field, 'rgba(255, 0, 0, 0.5)');
+    // Ensure this field is set as the current textarea
+    currentTextarea = field;
   }
 }
 // Add this function to stop pulsating
@@ -349,6 +355,7 @@ function stopPulsating(e) {
   }
 }
 
+}
 }
 
  function autoResize(e) {
@@ -429,5 +436,3 @@ function extractTextFromResponse(apiResponse) {
   }
   return extractedText;
 }
-
-
