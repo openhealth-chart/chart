@@ -21,8 +21,8 @@ function chartRecorderInit(key,pause = 400) {
   // start with first
   let currentTextarea;
 
+  
   function startRecording() {
-    function startRecording() {
       if (isRecording) return;
       isRecording = true;
       if (startButton) startButton.disabled = true;
@@ -86,12 +86,12 @@ function chartRecorderInit(key,pause = 400) {
 
   // Position the icon near the cursor
         document.addEventListener('mousemove', updateMicPosition);
-      })
+    })
       .catch(error => {
         console.error('Error accessing microphone:', error);
         if (debugDiv) debugDiv.innerHTML += `Microphone error: ${error.message}<br>`;
         isRecording = false;
-      });
+      })
   }
   function updateMicPosition(e) {
     const micIcon = document.getElementById('mic-icon');
@@ -353,8 +353,6 @@ function stopPulsating(e) {
   e.classList.remove('pulsating');
   removeFuzzyOutline(e);
   }
-}
-
 }
 }
 
