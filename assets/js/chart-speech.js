@@ -27,6 +27,10 @@ function chartRecorderInit(key,pause = 400) {
     if (startButton) startButton.disabled = true;
     if (stopButton) stopButton.disabled = false;
   
+    // If a field is already focused when recording starts, apply speech-to-text styling
+    if (currentTextarea) {
+      handleSpeechToText(currentTextarea);
+    }
     isRecording = true;
     audioChunks = [];
 
@@ -291,18 +295,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
   dictFields.forEach(field => {
     field.addEventListener('input', autoResize);
     field.addEventListener('focus', () => {
-      currentTextarea = field;
-      if (isRecording) {
-        handleSpeechToText(field);
-      } else {
-        setFuzzyOutline(field,'rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
-      }
-      updateBubblePosition();
-    })
+      handleFieldActivation(field);
+    });
     field.addEventListener('blur', () => {
       stopPulsating(field);
-    })
-    field.addEventListener('click', updateBubblePosition);
+    });
+
+    // Add this new click event listener
+    field.addEventListener('click', () => {
+      handleFieldActivation(field);
+    });
     field.addEventListener('keyup', updateBubblePosition);
     // Call autoResize immediately to set initial height (only for textareas)
     if (field.tagName.toLowerCase() === 'textarea') {
@@ -314,6 +316,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
   // Set the default field to the first one in the list
   currentTextarea = dictFields[0] || null;
 })
+function handleFieldActivation(field) {
+  currentTextarea = field;
+  if (isRecording) {
+    handleSpeechToText(field);
+  } else {
+    setFuzzyOutline(field, 'rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+  }
+  updateBubblePosition();
+}
 function setFuzzyOutline(e,color) {
     e.style.boxShadow = `0 0 8px 3px ${color}`;
 }
@@ -321,11 +332,12 @@ function setFuzzyOutline(e,color) {
 function removeFuzzyOutline(e) {
     e.style.boxShadow = 'none';
 }
-function handleSpeechToText(e) {
-  e.classList.add('pulsating');
-  setFuzzyOutline(e,'rgba(255, 0, 0, 0.5)');
+function handleSpeechToText(field) {
+  if (field) {
+    field.classList.add('pulsating');
+    setFuzzyOutline(field, 'rgba(255, 0, 0, 0.5)');
+  }
 }
-
 // Add this function to stop pulsating
 function stopPulsating(e) {
   if (e) {
