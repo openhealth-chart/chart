@@ -265,13 +265,14 @@ function chartRecorderInit(key,pause = 600) {
 
   function insertTextAtCursor(text) {
     if (!currentTextarea) return;
-    
-    const start = currentTextarea.selectionStart;
-    const end = currentTextarea.selectionEnd;
-    const before = currentTextarea.value.substring(0, start);
-    const after = currentTextarea.value.substring(end, currentTextarea.value.length);
-    currentTextarea.value = before + text + after;
-    currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
+    if (currentTextarea.tagName.toLowerCase() === 'textarea' || currentTextarea.type === 'text') {
+      const start = currentTextarea.selectionStart;
+      const end = currentTextarea.selectionEnd;
+      const before = currentTextarea.value.substring(0, start);
+      const after = currentTextarea.value.substring(end, currentTextarea.value.length);
+      currentTextarea.value = before + text + after;
+      currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
+    }
     currentTextarea.focus();
     handleSpeechToText();
   }
@@ -282,37 +283,47 @@ function showLoading() {
 function hideLoading() {
     document.getElementById('loading-overlay').style.display = 'none';
     }
+
 document.addEventListener('DOMContentLoaded', (event) => {
-    const textareas = document.querySelectorAll('textarea');
-    textareas.forEach(textarea => {
-    textarea.addEventListener('input', autoResize);
-    textarea.addEventListener('focus', () => {
-      currentTextarea = textarea;
+  // Select all textareas and inputs with 'dict' in their class list
+  const dictFields = document.querySelectorAll('textarea.dict, input.dict');
+
+  dictFields.forEach(field => {
+    field.addEventListener('input', autoResize);
+    field.addEventListener('focus', () => {
+      currentTextarea = field;
       if (isRecording) {
         handleSpeechToText();
-      } else 
-        setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
-      updateBubblePosition(); 
+      } else {}
+      setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+      updateBubblePosition();
+    }
     });
-    textarea.addEventListener('blur', () =>{
-      stopPulsating();
+    field.addEventListener('blur', () => {
+      removeFuzzyOutline();
     });
-
-// Call autoResize immediately to set initial height
-    autoResize({ target: textarea });
-    currentTextarea = document.querySelector('textarea'); // Default to first textarea
-
-    // Add event listeners to all textareas to track the current one
-    });
+    field.addEventListener('click', updateBubblePosition);
+    field.addEventListener('keyup', updateBubblePosition);
     if (stopButton) stopButton.disabled = true;
+    // Call autoResize immediately to set initial height (only for textareas)
+    if (field.tagName.toLowerCase() === 'textarea') {
+      autoResize({ target: field });
+    }
+  });
 
+  // Set the default field to the first one in the list
+  currentTextarea = dictFields[0] || null;
 });
 function setFuzzyOutline(color) {
-  currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
+  if (currentTextarea) {
+    currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
+  }
 }
 
 function removeFuzzyOutline() {
-  currentTextarea.style.boxShadow = 'none';
+  if (currentTextarea) {
+    currentTextarea.style.boxShadow = 'none';
+  }
 }
 function handleSpeechToText() {
   currentTextarea.classList.add('pulsating');
@@ -325,11 +336,12 @@ function stopPulsating() {
   removeFuzzyOutline();
 }
 function autoResize(e) {
-        e.target.style.height = 'auto';
-        e.target.style.height = (e.target.scrollHeight) + 'px';
-        e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
-    }
- // Function to send PDF to Google Cloud Vision OCR
+  if (e.target.tagName.toLowerCase() === 'textarea') {
+    e.target.style.height = 'auto';
+    e.target.style.height = (e.target.scrollHeight) + 'px';
+    e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
+  }
+} // Function to send PDF to Google Cloud Vision OCR
 
 }
 // THIS IS CLAUDE BUT DOESN'T WORK
