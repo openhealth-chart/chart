@@ -36,9 +36,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
     field.addEventListener('keyup', updateBubblePosition);
     // Call autoResize immediately to set initial height (only for textareas)
-    if (field.tagName.toLowerCase() === 'textarea') {
-      autoResize({ target: field });
-    }
+    autoResize(field);
   });
   if (stopButton) stopButton.disabled = true;
 
@@ -322,6 +320,7 @@ function chartRecorderInit(key,pause = 400) {
       currentTextarea.value = before + text + after;
       currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
     }
+    autoResize(currentTextarea);
     //currentTextarea.focus();
     handleSpeechToText(currentTextarea);
   }
@@ -364,11 +363,12 @@ function stopPulsating(e) {
 }
 
 
- function autoResize(e) {
-  if (e.target.tagName.toLowerCase() === 'textarea') {
-    e.target.style.height = 'auto';
-    e.target.style.height = (e.target.scrollHeight) + 'px';
-    e.target.scrollTop = e.target.scrollHeight - e.target.clientHeight; 
+function autoResize(e) {
+  const elem = e.target || e;
+  if (elem.tagName.toLowerCase() === 'textarea') {
+    elem.style.height = 'auto';
+    elem.style.height = (elem.scrollHeight) + 'px';
+    elem.scrollTop = elem.scrollHeight - elem.clientHeight; 
   }
 } // Function to send PDF to Google Cloud Vision OCR
 
