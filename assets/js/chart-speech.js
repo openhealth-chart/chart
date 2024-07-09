@@ -347,69 +347,7 @@ function stopPulsating(e) {
 }
 
 }
-// THIS IS CLAUDE BUT DOESN'T WORK
-/*
-async function sendPdfToGoogleCloudOcr(pdfFile,apiKey) {
-  // Base64 encode the PDF file
-  const fileReader = new FileReader();
-  const base64EncodedPdf = await new Promise((resolve) => {
-    console.log('starting file read');
-    fileReader.onload = () => resolve(fileReader.result.split(',')[1]);
-    fileReader.readAsDataURL(pdfFile);
-  });
 
-  // Prepare the request body
-  const requestBody = {
-    requests: [
-      {
-        inputConfig: {
-          mimeType: 'application/pdf',
-          content: base64EncodedPdf
-        },
-        features: [
-          {
-            type: 'DOCUMENT_TEXT_DETECTION'
-          }
-        ]
-      }
-    ]
-  };
-
-  // Send the request to Google Cloud Vision API
-  try {
-    console.log('sending to Google Vision<');
-    const response = await fetch('https://vision.googleapis.com/v1/files:annotate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}` // Replace with your actual API key
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    console.log('returned from  Google Vision');
-    const result = await response.json();
-    return extractTextFromResponse(result);
-  } catch (error) {
-    console.error(error.message);
-    throw error;
-  }
-}
-
-// Helper function to extract text from the API response
-function extractTextFromResponse(apiResponse) {
-  let extractedText = '';
-  apiResponse.responses.forEach(response => {
-    if (response.fullTextAnnotation) {
-      extractedText += response.fullTextAnnotation.text + '\n';
-    }
-  });
-  return extractedText;
-}
-  */
  function autoResize(e) {
   if (e.target.tagName.toLowerCase() === 'textarea') {
     e.target.style.height = 'auto';
