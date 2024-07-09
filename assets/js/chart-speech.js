@@ -318,6 +318,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 function handleFieldActivation(field) {
   currentTextarea = field;
+  if (document.activeElement !== field) {
+    field.focus(); // Ensure the field is focused
+  }
   if (isRecording) {
     handleSpeechToText(field);
   } else {
