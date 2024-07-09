@@ -300,10 +300,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   dictFields.forEach(field => {
     field.addEventListener('click', () => {
+        console.log("click:",field.name)
         handleFieldActivation(field);
     });
     field.addEventListener('input', autoResize);
     field.addEventListener('focus', () => {
+      console.log("focus:",field.name)
       handleFieldActivation(field);
     });
     field.addEventListener('blur', () => {
@@ -322,6 +324,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 })
 function handleFieldActivation(field) {
   currentTextarea = field;
+  console.log("field activated:", field.name)
   if (document.activeElement !== field) {
     field.focus(); // Ensure the field is focused
   }
