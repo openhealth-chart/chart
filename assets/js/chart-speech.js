@@ -277,12 +277,14 @@ function chartRecorderInit(key,pause = 600) {
     handleSpeechToText();
   }
 function showLoading() {
-    document.getElementById('loading-overlay').style.display = 'flex';
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'flex';
     }
 
 function hideLoading() {
-    document.getElementById('loading-overlay').style.display = 'none';
-    }
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
 
 document.addEventListener('DOMContentLoaded', (event) => {
   // Select all textareas and inputs with 'dict' in their class list
@@ -294,10 +296,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
       currentTextarea = field;
       if (isRecording) {
         handleSpeechToText();
-      } else {}
-      setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
-      updateBubblePosition();
-    }
+      } else {
+        setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
+        updateBubblePosition();
+      }
     });
     field.addEventListener('blur', () => {
       removeFuzzyOutline();
