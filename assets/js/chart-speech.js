@@ -295,14 +295,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
     field.addEventListener('focus', () => {
       currentTextarea = field;
       if (isRecording) {
-        handleSpeechToText();
+        handleSpeechToText(field);
       } else {
-        setFuzzyOutline('rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
-        updateBubblePosition();
+        setFuzzyOutline(field,'rgba(0, 0, 255, 0.5)'); // Semi-transparent blue
       }
+      updateBubblePosition();
     })
     field.addEventListener('blur', () => {
-      removeFuzzyOutline();
+      stopPulsating(this);
     })
     field.addEventListener('click', updateBubblePosition);
     field.addEventListener('keyup', updateBubblePosition);
@@ -316,26 +316,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
   // Set the default field to the first one in the list
   currentTextarea = dictFields[0] || null;
 })
-function setFuzzyOutline(color) {
-  if (currentTextarea) {
-    currentTextarea.style.boxShadow = `0 0 8px 3px ${color}`;
-  }
+function setFuzzyOutline(e,color) {
+    e.style.boxShadow = `0 0 8px 3px ${color}`;
 }
 
-function removeFuzzyOutline() {
-  if (currentTextarea) {
-    currentTextarea.style.boxShadow = 'none';
-  }
+function removeFuzzyOutline(e) {
+    e.style.boxShadow = 'none';
 }
-function handleSpeechToText() {
-  currentTextarea.classList.add('pulsating');
-  setFuzzyOutline('rgba(255, 0, 0, 0.5)');
+function handleSpeechToText(e) {
+  e.classList.add('pulsating');
+  setFuzzyOutline(e,'rgba(255, 0, 0, 0.5)');
 }
 
 // Add this function to stop pulsating
-function stopPulsating() {
-  currentTextarea.classList.remove('pulsating');
-  removeFuzzyOutline();
+function stopPulsating(e) {
+  e.classList.remove('pulsating');
+  removeFuzzyOutline(e);
 }
 function autoResize(e) {
   if (e.target.tagName.toLowerCase() === 'textarea') {
