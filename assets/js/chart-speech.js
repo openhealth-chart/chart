@@ -104,7 +104,7 @@ function chartRecorderInit(key,pause = 600) {
       stream.getTracks().forEach(track => track.stop());
     }
     sendAudioChunks(); // Process any remaining audio in the buffer
-    stopPulsating();
+    stopPulsating(currentTextarea);
     const micIcon = document.getElementById('mic-icon');
     if (micIcon) {
       micIcon.classList.add('hidden');
@@ -274,7 +274,7 @@ function chartRecorderInit(key,pause = 600) {
       currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
     }
     currentTextarea.focus();
-    handleSpeechToText();
+    // redundant handleSpeechToText(currentTextarea);
   }
 function showLoading() {
     const overlay = document.getElementById('loading-overlay');
@@ -302,16 +302,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
       updateBubblePosition();
     })
     field.addEventListener('blur', () => {
-      stopPulsating(this);
+      stopPulsating(field);
     })
     field.addEventListener('click', updateBubblePosition);
     field.addEventListener('keyup', updateBubblePosition);
-    if (stopButton) stopButton.disabled = true;
     // Call autoResize immediately to set initial height (only for textareas)
     if (field.tagName.toLowerCase() === 'textarea') {
       autoResize({ target: field });
     }
   });
+  if (stopButton) stopButton.disabled = true;
 
   // Set the default field to the first one in the list
   currentTextarea = dictFields[0] || null;
@@ -330,8 +330,10 @@ function handleSpeechToText(e) {
 
 // Add this function to stop pulsating
 function stopPulsating(e) {
+  if (e) {
   e.classList.remove('pulsating');
   removeFuzzyOutline(e);
+  }
 }
 function autoResize(e) {
   if (e.target.tagName.toLowerCase() === 'textarea') {
