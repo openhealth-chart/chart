@@ -1,4 +1,20 @@
 
+  let apiKey = null;
+  let  currentTextarea = null;
+
+  const startButton = document.getElementById('start-recognition');
+  const stopButton = document.getElementById('stop-recognition');
+
+  const debugDiv = document.getElementById('debug');
+  let mediaRecorder;
+  let isRecording = false;
+  let audioChunks = [];
+  let audioContext;
+  let audioAnalyzer;
+  let audioSource;
+  let silenceTimeout;
+  let stream;
+  let silenceDelay; // 1.2 seconds of silence
 document.addEventListener('DOMContentLoaded', (event) => {
   // Select all textareas and inputs with 'dict' in their class list
   console.log("document onLoad from chart-speech");
@@ -32,27 +48,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 // following this are functions not related to recording
 function chartRecorderInit(key,pause = 400) {
   console.log("chartRecorderInit function started");
-  const apiKey = key;
-  let  currentTextarea = null;
-
-  const startButton = document.getElementById('start-recognition');
-  const stopButton = document.getElementById('stop-recognition');
-
-  const debugDiv = document.getElementById('debug');
-  let mediaRecorder;
-  let isRecording = false;
-  let audioChunks = [];
-  let audioContext;
-  let audioAnalyzer;
-  let audioSource;
-  let silenceTimeout;
-  let stream;
-  const silenceDelay = pause; // 1.2 seconds of silence
-
+  apiKey = key;
   if (startButton) startButton.addEventListener('click', startRecording);
   if (stopButton) stopButton.addEventListener('click', stopRecording);
+  silenceDelay = pause;
   // start with first
-
+}
   function startRecording() {
       if (isRecording) return;
       isRecording = true;
@@ -361,7 +362,7 @@ function stopPulsating(e) {
   removeFuzzyOutline(e);
   }
 }
-}
+
 
  function autoResize(e) {
   if (e.target.tagName.toLowerCase() === 'textarea') {
