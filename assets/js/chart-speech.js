@@ -280,8 +280,8 @@ function chartRecorderInit(key,pause = 400) {
       currentTextarea.value = before + text + after;
       currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
     }
-    currentTextarea.focus();
-    // redundant handleSpeechToText(currentTextarea);
+    //currentTextarea.focus();
+    handleSpeechToText(currentTextarea);
   }
 
 document.addEventListener('DOMContentLoaded', (event) => {
