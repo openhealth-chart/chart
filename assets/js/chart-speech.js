@@ -265,6 +265,12 @@ function chartRecorderInit(key,pause = 400) {
   }
 
   function insertTextAtCursor(text) {
+    if (!currentTextarea || !document.body.contains(currentTextarea)) {
+      // If currentTextarea is not set or no longer in the document,
+      // set it to the first available dict field
+      const dictFields = document.querySelectorAll('textarea.dict, input.dict');
+      currentTextarea = dictFields[0] || null;
+    }
     if (!currentTextarea) return;
     if (currentTextarea.tagName.toLowerCase() === 'textarea' || currentTextarea.type === 'text') {
       const start = currentTextarea.selectionStart;
