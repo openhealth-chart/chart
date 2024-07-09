@@ -1,9 +1,40 @@
 
+document.addEventListener('DOMContentLoaded', (event) => {
+  // Select all textareas and inputs with 'dict' in their class list
+  console.log("document onLoad from chart-speech");
+  const dictFields = document.querySelectorAll('textarea.dict, input.dict');
+
+  dictFields.forEach(field => {
+    console.log("iterating over ",field.tagName,':',field.name);
+    field.addEventListener('click', () => {
+        console.log("click:",field.name)
+        handleFieldActivation(field);
+    });
+    field.addEventListener('input', autoResize);
+    field.addEventListener('focus', () => {
+      console.log("focus:",field.name)
+      handleFieldActivation(field);
+    });
+    field.addEventListener('blur', () => {
+      stopPulsating(field);
+    });
+    field.addEventListener('keyup', updateBubblePosition);
+    // Call autoResize immediately to set initial height (only for textareas)
+    if (field.tagName.toLowerCase() === 'textarea') {
+      autoResize({ target: field });
+    }
+  });
+  if (stopButton) stopButton.disabled = true;
+
+  // Set the default field to the first one in the list
+  currentTextarea = dictFields[0] || null;
+})
 // following this are functions not related to recording
 function chartRecorderInit(key,pause = 400) {
+  console.log("chartRecorderInit function started");
   const apiKey = key;
   let  currentTextarea = null;
-  
+
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
 
@@ -294,35 +325,6 @@ function chartRecorderInit(key,pause = 400) {
     handleSpeechToText(currentTextarea);
   }
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  // Select all textareas and inputs with 'dict' in their class list
-  console.log("document onLoad");
-  const dictFields = document.querySelectorAll('textarea.dict, input.dict');
-
-  dictFields.forEach(field => {
-    field.addEventListener('click', () => {
-        console.log("click:",field.name)
-        handleFieldActivation(field);
-    });
-    field.addEventListener('input', autoResize);
-    field.addEventListener('focus', () => {
-      console.log("focus:",field.name)
-      handleFieldActivation(field);
-    });
-    field.addEventListener('blur', () => {
-      stopPulsating(field);
-    });
-    field.addEventListener('keyup', updateBubblePosition);
-    // Call autoResize immediately to set initial height (only for textareas)
-    if (field.tagName.toLowerCase() === 'textarea') {
-      autoResize({ target: field });
-    }
-  });
-  if (stopButton) stopButton.disabled = true;
-
-  // Set the default field to the first one in the list
-  currentTextarea = dictFields[0] || null;
-})
 function handleFieldActivation(field) {
   currentTextarea = field;
   console.log("field activated:", field.name)
