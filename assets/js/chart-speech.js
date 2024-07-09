@@ -1,7 +1,9 @@
+
 // following this are functions not related to recording
 function chartRecorderInit(key,pause = 400) {
   const apiKey = key;
-
+  let  currentTextarea = null;
+  
   const startButton = document.getElementById('start-recognition');
   const stopButton = document.getElementById('stop-recognition');
 
@@ -19,9 +21,7 @@ function chartRecorderInit(key,pause = 400) {
   if (startButton) startButton.addEventListener('click', startRecording);
   if (stopButton) stopButton.addEventListener('click', stopRecording);
   // start with first
-  let currentTextarea;
 
-  
   function startRecording() {
       if (isRecording) return;
       isRecording = true;
@@ -275,7 +275,7 @@ function chartRecorderInit(key,pause = 400) {
   }
 
   function insertTextAtCursor(text) {
-    if (!currentTextarea || !document.body.contains(currentTextarea)) {
+    if (!currentTextarea) {
       // If currentTextarea is not set or no longer in the document,
       // set it to the first available dict field
       const dictFields = document.querySelectorAll('textarea.dict, input.dict');
@@ -296,6 +296,7 @@ function chartRecorderInit(key,pause = 400) {
 
 document.addEventListener('DOMContentLoaded', (event) => {
   // Select all textareas and inputs with 'dict' in their class list
+  console.log("document onLoad");
   const dictFields = document.querySelectorAll('textarea.dict, input.dict');
 
   dictFields.forEach(field => {
@@ -347,6 +348,7 @@ function handleSpeechToText(field) {
     field.classList.add('pulsating');
     setFuzzyOutline(field, 'rgba(255, 0, 0, 0.5)');
     // Ensure this field is set as the current textarea
+    console.log("currentTextarea being set:",field.name);
     currentTextarea = field;
   }
 }
