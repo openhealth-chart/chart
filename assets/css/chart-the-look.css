@@ -71,11 +71,11 @@ textarea {
     padding: 10px;
     font-size: 16px;
     box-sizing: border-box;
-    resize: none;
-    overflow: hidden;
+    resize: vertical; /* Allow vertical resizing */
     min-height: 50px;
+    overflow-y: hidden; /* Hide vertical scrollbar */
     transition: height 0.2s ease;
-};
+}
 @media (min-width: 992px) {
     .custom-width-lg {
     width: 95%;

@@ -361,16 +361,15 @@ function stopPulsating(e) {
   removeFuzzyOutline(e);
   }
 }
-
-
 function autoResize(e) {
-  const elem = e.target || e;
-  if (elem.tagName.toLowerCase() === 'textarea') {
-    elem.style.height = 'auto';
-    elem.style.height = (elem.scrollHeight) + 'px';
-    elem.scrollTop = elem.scrollHeight - elem.clientHeight; 
+    const elem = e.target || e;
+    if (elem.tagName.toLowerCase() === 'textarea') {
+      // Reset height to auto
+      elem.style.height = 'auto';
+      // Set the height to the scrollHeight
+      elem.style.height = (elem.scrollHeight) + 'px';
+    }
   }
-} // Function to send PDF to Google Cloud Vision OCR
 
 function showLoading() {
   const overlay = document.getElementById('loading-overlay');
