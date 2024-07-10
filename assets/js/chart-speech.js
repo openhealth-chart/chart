@@ -36,7 +36,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
     field.addEventListener('keyup', updateBubblePosition);
     // Call autoResize immediately to set initial height (only for textareas)
-    autoResize(field);
+    if (field.tagName.toLowerCase() === 'textarea') {
+      autoResize(field);
+    }
   });
   if (stopButton) stopButton.disabled = true;
 
