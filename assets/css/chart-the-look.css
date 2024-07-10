@@ -27,6 +27,9 @@ h1, h2, h3 {
     padding: 10px 0;
     line-height: 1.6;
 }
+.key {
+    font-weight:700;
+}
 table {
     width: 100%;
     border-collapse: collapse;
