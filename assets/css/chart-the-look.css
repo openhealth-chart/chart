@@ -71,9 +71,9 @@ textarea {
     padding: 10px;
     font-size: 16px;
     box-sizing: border-box;
-    resize: vertical; /* Allow vertical resizing */
-    min-height: 50px;
+    resize: none; /* Disable manual resizing */
     overflow-y: hidden; /* Hide vertical scrollbar */
+    min-height: 50px;
     transition: height 0.2s ease;
 }
 @media (min-width: 992px) {

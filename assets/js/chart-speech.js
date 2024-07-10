@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   dictFields.forEach(field => {
     console.log("iterating over ",field.tagName,':',field.name);
+    if (field.tagName.toLowerCase() === 'textarea') {
+      field.addEventListener('input', function() {
+          autoResize(this);
+      });
+      // Initial call to set the correct height
+      autoResize(field);
+  }
     field.addEventListener('click', () => {
         console.log("click:",field.name)
         handleFieldActivation(field);
@@ -36,9 +43,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
     field.addEventListener('keyup', updateBubblePosition);
     // Call autoResize immediately to set initial height (only for textareas)
-    if (field.tagName.toLowerCase() === 'textarea') {
-      autoResize(field);
-    }
   });
   if (stopButton) stopButton.disabled = true;
 
@@ -308,23 +312,27 @@ function chartRecorderInit(key,pause = 400) {
 
   function insertTextAtCursor(text) {
     if (!currentTextarea) {
-      // If currentTextarea is not set or no longer in the document,
-      // set it to the first available dict field
-      const dictFields = document.querySelectorAll('textarea.dict, input.dict');
-      currentTextarea = dictFields[0] || null;
+        // If currentTextarea is not set or no longer in the document,
+        // set it to the first available dict field
+        const dictFields = document.querySelectorAll('textarea.dict, input.dict');
+        currentTextarea = dictFields[0] || null;
     }
     if (!currentTextarea) return;
     if (currentTextarea.tagName.toLowerCase() === 'textarea' || currentTextarea.type === 'text') {
-      const start = currentTextarea.selectionStart;
-      const end = currentTextarea.selectionEnd;
-      const before = currentTextarea.value.substring(0, start);
-      const after = currentTextarea.value.substring(end, currentTextarea.value.length);
-      currentTextarea.value = before + text + after;
-      currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
-      autoResize(currentTextarea);
-      handleSpeechToText(currentTextarea);
-    } 
-  }
+        const start = currentTextarea.selectionStart;
+        const end = currentTextarea.selectionEnd;
+        const before = currentTextarea.value.substring(0, start);
+        const after = currentTextarea.value.substring(end, currentTextarea.value.length);
+        currentTextarea.value = before + text + after;
+        currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
+        
+        // Call autoResize for textareas
+        if (currentTextarea.tagName.toLowerCase() === 'textarea') {
+            autoResize(currentTextarea);
+        }
+    }
+    handleSpeechToText(currentTextarea);
+}
 
 function handleFieldActivation(field) {
   currentTextarea = field;
@@ -364,14 +372,11 @@ function stopPulsating(e) {
 }
 function autoResize(e) {
     const elem = e.target || e;
-    if (elem.tagName.toLowerCase() === 'textarea') {
-      // Reset height to auto
-      elem.style.height = 'auto';
-      // Set the height to the scrollHeight
-      elem.style.height = (elem.scrollHeight) + 'px';
-    }
-  }
-
+    // Reset the height to auto first
+    elem.style.height = 'auto';
+    // Set the height to the scrollHeight
+    elem.style.height = (elem.scrollHeight) + 'px';
+}
 function showLoading() {
   const overlay = document.getElementById('loading-overlay');
   if (overlay) overlay.style.display = 'flex';
