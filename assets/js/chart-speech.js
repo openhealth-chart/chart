@@ -321,10 +321,9 @@ function chartRecorderInit(key,pause = 400) {
       const after = currentTextarea.value.substring(end, currentTextarea.value.length);
       currentTextarea.value = before + text + after;
       currentTextarea.selectionStart = currentTextarea.selectionEnd = start + text.length;
-    }
-    autoResize(currentTextarea);
-    //currentTextarea.focus();
-    handleSpeechToText(currentTextarea);
+      autoResize(currentTextarea);
+      handleSpeechToText(currentTextarea);
+    } 
   }
 
 function handleFieldActivation(field) {
