@@ -9,8 +9,7 @@ export class ChartRecorder {
 
 
     this.init();
-
-    ChartSpeech.instance = this;
+    ChartRecorder.instance = this;
   }
 
   init() {
