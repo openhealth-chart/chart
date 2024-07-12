@@ -260,6 +260,7 @@ export class ChartRecorder {
 
   showTranscriptionBubble(text) {
     const bubble = document.getElementById('transcription-bubble');
+    if (!bubble) return;
     bubble.textContent = text;
     bubble.classList.remove('hidden');
 
@@ -282,6 +283,7 @@ export class ChartRecorder {
   updateBubblePosition(e) {
     const bubble = document.getElementById('transcription-bubble');
     if (!this.currentTextarea) return;
+    if (!bubble) return;
     const rect = this.currentTextarea.getBoundingClientRect();
 
     let x, y;
