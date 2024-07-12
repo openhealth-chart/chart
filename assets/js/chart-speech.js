@@ -1,7 +1,7 @@
-class ChartSpeech {
+class ChartRecorder {
   constructor(apiKey, silenceDelay = 400) {
-    if (ChartSpeech.instance) {
-      return ChartSpeech.instance;
+    if (ChartRecorder.instance) {
+      return ChartRecorder.instance;
     }
 
     this.apiKey = apiKey;
