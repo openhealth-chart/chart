@@ -281,6 +281,7 @@ export class ChartRecorder {
 
   updateBubblePosition(e) {
     const bubble = document.getElementById('transcription-bubble');
+    if (!this.currentTextarea) return;
     const rect = this.currentTextarea.getBoundingClientRect();
 
     let x, y;
