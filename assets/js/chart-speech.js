@@ -1,10 +1,20 @@
-class ChartRecorder {
+export class ChartRecorder {
   constructor(apiKey, silenceDelay = 400) {
     if (ChartRecorder.instance) {
       return ChartRecorder.instance;
     }
 
     this.apiKey = apiKey;
+    this.silenceDelay = silenceDelay;
+
+
+    this.init();
+
+    ChartSpeech.instance = this;
+  }
+
+  init() {
+    console.log("document onLoad from chart-speech");
     this.currentTextarea = null;
     this.startButton = document.getElementById('start-recognition');
     this.stopButton = document.getElementById('stop-recognition');
@@ -17,16 +27,8 @@ class ChartRecorder {
     this.audioSource = null;
     this.silenceTimeout = null;
     this.stream = null;
-    this.silenceDelay = silenceDelay;
     this.bubbleTimeout = null;
-
-    this.init();
-
-    ChartSpeech.instance = this;
-  }
-
-  init() {
-    console.log("document onLoad from chart-speech");
+    
     const dictFields = document.querySelectorAll('textarea.dict, input.dict');
 
     dictFields.forEach(field => {
