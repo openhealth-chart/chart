@@ -376,6 +376,7 @@ export class ChartRecorder {
 
   autoResize(e) {
     const elem = e.target || e;
+    if (elem.tagName.toLowerCase() !== 'textarea') return;
     // Store the current scroll position
     const scrollTop = elem.scrollTop;
     // Temporarily shrink the textarea to get the correct scrollHeight
