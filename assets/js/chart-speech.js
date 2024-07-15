@@ -376,10 +376,15 @@ export class ChartRecorder {
 
   autoResize(e) {
     const elem = e.target || e;
-    // Reset the height to auto first
-    elem.style.height = 'auto';
+    // Store the current scroll position
+    const scrollTop = elem.scrollTop;
+    // Temporarily shrink the textarea to get the correct scrollHeight
+    elem.style.height = '0';
     // Set the height to the scrollHeight
-    elem.style.height = (elem.scrollHeight) + 'px';
+    const newHeight = elem.scrollHeight;
+    elem.style.height = newHeight + 'px';
+    // Restore the scroll position
+    elem.scrollTop = scrollTop;
   }
 
   showLoading() {
