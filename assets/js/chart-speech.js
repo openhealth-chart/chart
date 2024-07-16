@@ -161,6 +161,11 @@ export class ChartRecorder {
   }
 
   detectSilence() {
+    if (!this.audioAnalyzer) {
+      console.error("Audio analyzer not initialized, stopping recording");
+      this.stopRecording();
+      return;
+    }
     const bufferLength = this.audioAnalyzer.fftSize;
     const dataArray = new Uint8Array(bufferLength);
 
@@ -457,4 +462,12 @@ export class ChartRecorder {
     }
     return extractedText;
   }
+}
+export function extractAnswer(result) {
+  if (typeof(result) === 'object') {
+    const answer = result.answer;
+    if (answer) return answer;
+    return result[Object.keys(result)[0]];
+  }
+  return result;
 }
