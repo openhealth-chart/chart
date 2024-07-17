@@ -6,8 +6,6 @@ export class ChartRecorder {
 
     this.apiKey = apiKey;
     this.silenceDelay = silenceDelay;
-
-
     this.init();
     ChartRecorder.instance = this;
   }
