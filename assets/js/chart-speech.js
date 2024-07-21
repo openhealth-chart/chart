@@ -23,18 +23,15 @@ export class ChartRecorder {
     const dictFields = document.querySelectorAll('textarea.dict, input.dict');
 
     dictFields.forEach(field => {
-      console.log("iterating over ", field.tagName, ':', field.name);
-      if (field.tagName.toLowerCase() === 'textarea') {
+            if (field.tagName.toLowerCase() === 'textarea') {
         field.addEventListener('input', () => this.autoResize(field));
         this.autoResize(field);
       }
       field.addEventListener('click', () => {
-        console.log("click:", field.name);
         this.handleFieldActivation(field);
       });
       field.addEventListener('input', () => this.autoResize(field));
       field.addEventListener('focus', () => {
-        console.log("focus:", field.name);
         this.handleFieldActivation(field);
       });
       field.addEventListener('blur', () => this.stopPulsating(field));
