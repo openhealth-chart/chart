@@ -1,15 +1,9 @@
 export class ChartRecorder {
   constructor(apiKey, silenceDelay = 400) {
-    if (ChartRecorder.instance) {
-      return ChartRecorder.instance;
-    }
-
     this.apiKey = apiKey;
     this.silenceDelay = silenceDelay;
     this.init();
-    ChartRecorder.instance = this;
   }
-
   init() {
     console.log("document onLoad from chart-speech");
     this.currentTextarea = null;
