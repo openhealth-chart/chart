@@ -19,7 +19,8 @@ export class ChartRecorder {
     this.silenceTimeout = null;
     this.stream = null;
     this.bubbleTimeout = null;
-    
+    this.mode = 'medical_dictation';
+
     const dictFields = document.querySelectorAll('textarea.dict, input.dict');
 
     dictFields.forEach(field => {
@@ -50,7 +51,12 @@ export class ChartRecorder {
     this.isRecording = true;
     if (this.startButton) this.startButton.disabled = true;
     if (this.stopButton) this.stopButton.disabled = false;
-
+    let convoCheck = document.getElementById("isConversation");
+    if (convoCheck && convoCheck.checked) {
+      this.mode = 'medical_conversation';
+    } else {
+      this.mode = 'medical_dictation';
+    };
     // If no textarea is currently selected, select the first one
     if (!this.currentTextarea) {
       const dictFields = document.querySelectorAll('textarea.dict, input.dict');
@@ -189,7 +195,9 @@ export class ChartRecorder {
 
     checkSilence();
   }
-
+  setMode(mode = 'medical_dictation') {
+    this.mode = mode;
+  }
   async sendAudioChunks() {
     if (this.audioChunks.length === 0) return;
     const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
@@ -214,7 +222,7 @@ export class ChartRecorder {
                 encoding: 'WEBM_OPUS',
                 sampleRateHertz: 48000,
                 languageCode: 'en-US',
-                model: 'medical_dictation',
+                model: this.mode,
                 enableAutomaticPunctuation: true
               },
               audio: {
