@@ -56,6 +56,7 @@
     <script src="https://unpkg.com/cornerstone-tools@6.0.6/dist/cornerstoneTools.min.js"></script>
     <script src="https://unpkg.com/cornerstone-wado-image-loader@4.13.2/dist/cornerstoneWADOImageLoader.bundle.min.js"></script>
     <script src="https://unpkg.com/dicom-parser@1.8.7/dist/dicomParser.min.js"></script>
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
 
     <script>
         const fileListElement = document.getElementById('fileList');
@@ -101,6 +102,7 @@
             currentImageIndex = index;
             const file = currentSeriesFiles[currentImageIndex];
             const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
+            
             cornerstone.enable(imageElement);
 
             try {
@@ -169,11 +171,12 @@
             cornerstone.setViewport(imageElement, viewport);
         }
 
-        // Initialize Cornerstone
+        // Initialize Cornerstone and Cornerstone Tools
         cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
         cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
         cornerstoneTools.external.cornerstone = cornerstone;
         cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
+        cornerstoneTools.external.Hammer = Hammer; // Add this line
         cornerstoneTools.init();
 
         cornerstoneWADOImageLoader.configure({
