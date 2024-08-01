@@ -102,7 +102,7 @@
             const file = currentSeriesFiles[currentImageIndex];
             const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
             cornerstone.enable(imageElement);
-            
+
             try {
                 const image = await cornerstone.loadImage(imageId);
                 cornerstone.displayImage(imageElement, image);
