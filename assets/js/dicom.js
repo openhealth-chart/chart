@@ -1,16 +1,25 @@
-import { promises as fs } from 'fs';
+import { healthcare } from '@googleapis/healthcare';
+import { GoogleAuth } from 'google-auth-library';
+import fs from 'fs/promises';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import dicomParser from 'https://cdn.jsdelivr.net/npm/dicom-parser@1.8.21/dist/dicomParser.min.js';//dicom-parser';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const auth = new GoogleAuth({
+  scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+});
 
-async function uploadDicomCD(baseUrl, cdPath) {
+const healthcareClient = healthcare({
+  version: 'v1',
+  auth: auth,
+});
+
+async function uploadDicomCD(projectId, cloudRegion, datasetId, dicomStoreId, cdPath) {
+  const parent = `projects/${projectId}/locations/${cloudRegion}/datasets/${datasetId}/dicomStores/${dicomStoreId}`;
+  const dicomWebPath = 'studies';
+
   try {
     const dicomFiles = await findDicomFiles(cdPath);
     for (const filePath of dicomFiles) {
-      await uploadDicomFile(baseUrl, filePath);
+      await uploadDicomFile(parent, dicomWebPath, filePath);
     }
     console.log('All DICOM files uploaded successfully');
   } catch (error) {
@@ -33,41 +42,37 @@ async function findDicomFiles(dir) {
   return results;
 }
 
-async function uploadDicomFile(baseUrl, filePath) {
+async function uploadDicomFile(parent, dicomWebPath, filePath) {
   try {
-    const dicomData = await fs.readFile(filePath);
-    const dataSet = dicomParser.parseDicom(dicomData);
+    const binaryData = fs.createReadStream(filePath);
+    const request = {
+      parent,
+      dicomWebPath,
+      requestBody: binaryData,
+    };
 
-    const studyInstanceUID = dataSet.string('x0020000d');
-    const seriesInstanceUID = dataSet.string('x0020000e');
-    const sopInstanceUID = dataSet.string('x00080018');
-
-    if (!studyInstanceUID || !seriesInstanceUID || !sopInstanceUID) {
-      throw new Error('Missing required DICOM tags');
-    }
-
-    const uploadUrl = `${baseUrl}/studies/${studyInstanceUID}/series/${seriesInstanceUID}/instances/${sopInstanceUID}`;
-
-    const response = await fetch(uploadUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/dicom',
-      },
-      body: dicomData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const instance = await healthcareClient.projects.locations.datasets.dicomStores.storeInstances(
+      request,
+      {
+        headers: {
+          'Content-Type': 'application/dicom',
+          Accept: 'application/dicom+json',
+        },
+      }
+    );
 
     console.log(`Uploaded: ${path.basename(filePath)}`);
+    console.log('Stored DICOM instance:\n', JSON.stringify(instance.data));
   } catch (error) {
     console.error(`Error uploading file ${filePath}:`, error);
   }
 }
 
 // Usage
-const baseUrl = 'https://your-dicomweb-server.com';
+const projectId = 'your-project-id';
+const cloudRegion = 'us-central1';
+const datasetId = 'your-dataset-id';
+const dicomStoreId = 'your-dicom-store-id';
 const cdPath = '/path/to/dicom/cd';
 
-uploadDicomCD(baseUrl, cdPath);
+uploadDicomCD(projectId, cloudRegion, datasetId, dicomStoreId, cdPath);

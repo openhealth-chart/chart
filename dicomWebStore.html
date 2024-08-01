@@ -4,42 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DICOM CD Uploader</title>
+    <style>
+        #progressContainer {
+            width: 300px;
+            background-color: #f0f0f0;
+            margin-top: 20px;
+            display: none;
+        }
+        #progressBar {
+            width: 0;
+            height: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+        #currentFile {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>DICOM CD Uploader</h1>
     <input type="file" id="folderInput" webkitdirectory directory multiple>
     <button onclick="uploadDicomCD()">Upload DICOM CD</button>
-
+    <div id="progressContainer">
+        <div id="progressBar">0%</div>
+    </div>
+    <div id="currentFile"></div>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
-
     <script>
-        let gapi;
         let healthcare;
-
-        function loadHealthcareAPI() {
+        async function loadHealthcareAPI() {
             return new Promise((resolve, reject) => {
-                gapi.load('client', () => {
-                    gapi.client.load('healthcare', 'v1')
-                        .then(() => {
-                            healthcare = gapi.client.healthcare;
-                            resolve();
-                        })
-                        .catch(reject);
+                gapi.load('client', async () => {
+                    try {
+                        await gapi.client.load('healthcare', 'v1');
+                        healthcare = gapi.client.healthcare;
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
                 });
             });
         }
-
         async function initClient() {
-            await new Promise((resolve) => gapi.load('client', resolve));
+            await new Promise((resolve) => gapi.load('client:auth2', resolve));
             await loadHealthcareAPI();
-            await gapi.client.init({
+            await gapi.auth2.init({
                 apiKey: 'YOUR_API_KEY',
                 clientId: 'YOUR_CLIENT_ID',
                 scope: 'https://www.googleapis.com/auth/cloud-platform'
             });
         }
-
         async function uploadDicomCD() {
             const projectId = 'your-project-id';
             const cloudRegion = 'us-central1';
@@ -47,40 +65,47 @@
             const dicomStoreId = 'your-dicom-store-id';
             const parent = `projects/${projectId}/locations/${cloudRegion}/datasets/${datasetId}/dicomStores/${dicomStoreId}`;
             const dicomWebPath = 'studies';
-
             const fileInput = document.getElementById('folderInput');
             const files = Array.from(fileInput.files);
-
             const dicomFiles = files.filter(file => 
                 file.name.toLowerCase().endsWith('.dcm') || 
                 file.name.toLowerCase() === 'dicomdir'
             );
-
+            
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const currentFileDiv = document.getElementById('currentFile');
+            progressContainer.style.display = 'block';
+            
+            let uploadedCount = 0;
             for (const file of dicomFiles) {
+                currentFileDiv.textContent = `Uploading: ${file.name}`;
                 await uploadDicomFile(parent, dicomWebPath, file);
+                uploadedCount++;
+                const progress = Math.round((uploadedCount / dicomFiles.length) * 100);
+                progressBar.style.width = `${progress}%`;
+                progressBar.textContent = `${progress}%`;
             }
-
+            currentFileDiv.textContent = 'Upload complete!';
             console.log('All DICOM files uploaded successfully');
         }
-
         async function uploadDicomFile(parent, dicomWebPath, file) {
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const base64Data = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
-
+                const base64Data = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
                 const response = await healthcare.projects.locations.datasets.dicomStores.storeInstances({
                     parent: parent,
                     dicomWebPath: dicomWebPath,
-                    resource: base64Data
+                    resource: {
+                        content: base64Data
+                    }
                 });
-
                 console.log(`Uploaded: ${file.name}`);
                 console.log('Stored DICOM instance:', response.result);
             } catch (error) {
                 console.error(`Error uploading file ${file.name}:`, error);
             }
         }
-
         // Initialize the client when the page loads
         initClient().catch(console.error);
     </script>

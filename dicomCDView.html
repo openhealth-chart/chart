@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local DICOM Viewer</title>
+    <title>Enhanced Local DICOM Viewer</title>
     <style>
         #dicomImage {
             width: 512px;
@@ -19,56 +19,169 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+        #dicomInfo {
+            margin-top: 10px;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+        }
+        #seriesNavigation {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Local DICOM Viewer</h1>
+    <h1>Enhanced Local DICOM Viewer</h1>
     <input type="file" id="folderInput" webkitdirectory directory multiple>
     <div id="fileList"></div>
     <div id="dicomImage"></div>
+    <div id="dicomInfo"></div>
+    <div id="errorMessage"></div>
+    <div id="seriesNavigation">
+        <button id="prevImage">Previous</button>
+        <span id="imageIndex"></span>
+        <button id="nextImage">Next</button>
+    </div>
+    <div>
+        <label for="windowWidth">Window Width:</label>
+        <input type="range" id="windowWidth" min="1" max="4095" value="400">
+        <label for="windowCenter">Window Center:</label>
+        <input type="range" id="windowCenter" min="1" max="4095" value="200">
+    </div>
 
     <!-- Cornerstone library and its dependencies -->
     <script src="https://unpkg.com/cornerstone-core@2.3.0/dist/cornerstone.min.js"></script>
     <script src="https://unpkg.com/cornerstone-math@0.1.9/dist/cornerstoneMath.min.js"></script>
+    <script src="https://unpkg.com/cornerstone-tools@6.0.6/dist/cornerstoneTools.min.js"></script>
     <script src="https://unpkg.com/cornerstone-wado-image-loader@4.13.2/dist/cornerstoneWADOImageLoader.bundle.min.js"></script>
+    <script src="https://unpkg.com/dicom-parser@1.8.7/dist/dicomParser.min.js"></script>
 
     <script>
         const fileListElement = document.getElementById('fileList');
         const folderInput = document.getElementById('folderInput');
         const imageElement = document.getElementById('dicomImage');
+        const dicomInfoElement = document.getElementById('dicomInfo');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const prevImageButton = document.getElementById('prevImage');
+        const nextImageButton = document.getElementById('nextImage');
+        const imageIndexSpan = document.getElementById('imageIndex');
+        const windowWidthInput = document.getElementById('windowWidth');
+        const windowCenterInput = document.getElementById('windowCenter');
+
+        let currentSeriesFiles = [];
+        let currentImageIndex = 0;
 
         folderInput.addEventListener('change', handleFolderSelect);
+        prevImageButton.addEventListener('click', showPreviousImage);
+        nextImageButton.addEventListener('click', showNextImage);
+        windowWidthInput.addEventListener('input', updateWindowing);
+        windowCenterInput.addEventListener('input', updateWindowing);
 
-        function handleFolderSelect(event) {
-            const files = Array.from(event.target.files).filter(file => 
+        async function handleFolderSelect(event) {
+            currentSeriesFiles = Array.from(event.target.files).filter(file => 
                 file.name.toLowerCase().endsWith('.dcm') || 
                 file.name.toLowerCase() === 'dicomdir'
             );
 
             fileListElement.innerHTML = '';
-            files.forEach(file => {
+            currentSeriesFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.textContent = file.name;
-                fileItem.onclick = () => loadAndViewDicom(file);
+                fileItem.onclick = () => loadAndViewDicom(index);
                 fileListElement.appendChild(fileItem);
             });
+
+            if (currentSeriesFiles.length > 0) {
+                loadAndViewDicom(0);
+            }
         }
 
-        async function loadAndViewDicom(file) {
+        async function loadAndViewDicom(index) {
+            currentImageIndex = index;
+            const file = currentSeriesFiles[currentImageIndex];
             const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
             cornerstone.enable(imageElement);
             
             try {
                 const image = await cornerstone.loadImage(imageId);
                 cornerstone.displayImage(imageElement, image);
+                displayDicomInfo(image);
+
+                // Set up tools
+                const WwwcTool = cornerstoneTools.WwwcTool;
+                const PanTool = cornerstoneTools.PanTool;
+                const ZoomTool = cornerstoneTools.ZoomTool;
+                cornerstoneTools.addTool(WwwcTool);
+                cornerstoneTools.addTool(PanTool);
+                cornerstoneTools.addTool(ZoomTool);
+                cornerstoneTools.setToolActive('Wwwc', { mouseButtonMask: 1 });
+                cornerstoneTools.setToolActive('Pan', { mouseButtonMask: 2 });
+                cornerstoneTools.setToolActive('Zoom', { mouseButtonMask: 4 });
+
+                errorMessageElement.textContent = '';
+                updateImageIndex();
             } catch (error) {
                 console.error('Error loading DICOM image:', error);
+                errorMessageElement.textContent = `Error loading image: ${error.message}`;
             }
+        }
+
+        function displayDicomInfo(image) {
+            const dataSet = image.data;
+            const patientName = dataSet.string('x00100010') || 'N/A';
+            const studyDate = dataSet.string('x00080020') || 'N/A';
+            const modality = dataSet.string('x00080060') || 'N/A';
+            const seriesNumber = dataSet.string('x00200011') || 'N/A';
+
+            dicomInfoElement.innerHTML = `
+                <p>Patient: ${patientName}</p>
+                <p>Study Date: ${studyDate}</p>
+                <p>Modality: ${modality}</p>
+                <p>Series Number: ${seriesNumber}</p>
+            `;
+        }
+
+        function showPreviousImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                loadAndViewDicom(currentImageIndex);
+                updateImageIndex();
+            }
+        }
+
+        function showNextImage() {
+            if (currentImageIndex < currentSeriesFiles.length - 1) {
+                currentImageIndex++;
+                loadAndViewDicom(currentImageIndex);
+                updateImageIndex();
+            }
+        }
+
+        function updateImageIndex() {
+            imageIndexSpan.textContent = `Image ${currentImageIndex + 1} of ${currentSeriesFiles.length}`;
+        }
+
+        function updateWindowing() {
+            const viewport = cornerstone.getViewport(imageElement);
+            viewport.voi.windowWidth = parseInt(windowWidthInput.value);
+            viewport.voi.windowCenter = parseInt(windowCenterInput.value);
+            cornerstone.setViewport(imageElement, viewport);
         }
 
         // Initialize Cornerstone
         cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
         cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
+        cornerstoneTools.external.cornerstone = cornerstone;
+        cornerstoneTools.external.cornerstoneMath = cornerstoneMath;
+        cornerstoneTools.init();
+
+        cornerstoneWADOImageLoader.configure({
+            beforeSend: function(xhr) {
+                // Add custom headers here (e.g., auth tokens)
+            },
+            useWebWorkers: true,
+        });
     </script>
 </body>
 </html>
