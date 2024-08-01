@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local DICOM Viewer</title>
+    <style>
+        #dicomImage {
+            width: 512px;
+            height: 512px;
+            position: relative;
+            display: inline-block;
+            color: white;
+        }
+        #fileList {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Local DICOM Viewer</h1>
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+    <div id="fileList"></div>
+    <div id="dicomImage"></div>
+
+    <!-- Cornerstone library and its dependencies -->
+    <script src="https://unpkg.com/cornerstone-core@2.3.0/dist/cornerstone.min.js"></script>
+    <script src="https://unpkg.com/cornerstone-math@0.1.9/dist/cornerstoneMath.min.js"></script>
+    <script src="https://unpkg.com/cornerstone-wado-image-loader@4.13.2/dist/cornerstoneWADOImageLoader.bundle.min.js"></script>
+
+    <script>
+        const fileListElement = document.getElementById('fileList');
+        const folderInput = document.getElementById('folderInput');
+        const imageElement = document.getElementById('dicomImage');
+
+        folderInput.addEventListener('change', handleFolderSelect);
+
+        function handleFolderSelect(event) {
+            const files = Array.from(event.target.files).filter(file => 
+                file.name.toLowerCase().endsWith('.dcm') || 
+                file.name.toLowerCase() === 'dicomdir'
+            );
+
+            fileListElement.innerHTML = '';
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.textContent = file.name;
+                fileItem.onclick = () => loadAndViewDicom(file);
+                fileListElement.appendChild(fileItem);
+            });
+        }
+
+        async function loadAndViewDicom(file) {
+            const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(file);
+            cornerstone.enable(imageElement);
+            
+            try {
+                const image = await cornerstone.loadImage(imageId);
+                cornerstone.displayImage(imageElement, image);
+            } catch (error) {
+                console.error('Error loading DICOM image:', error);
+            }
+        }
+
+        // Initialize Cornerstone
+        cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
+        cornerstoneWADOImageLoader.external.dicomParser = dicomParser;
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DICOM CD Uploader</title>
+</head>
+<body>
+    <h1>DICOM CD Uploader</h1>
+    <input type="file" id="folderInput" webkitdirectory directory multiple>
+    <button onclick="uploadDicomCD()">Upload DICOM CD</button>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+
+    <script>
+        let gapi;
+        let healthcare;
+
+        function loadHealthcareAPI() {
+            return new Promise((resolve, reject) => {
+                gapi.load('client', () => {
+                    gapi.client.load('healthcare', 'v1')
+                        .then(() => {
+                            healthcare = gapi.client.healthcare;
+                            resolve();
+                        })
+                        .catch(reject);
+                });
+            });
+        }
+
+        async function initClient() {
+            await new Promise((resolve) => gapi.load('client', resolve));
+            await loadHealthcareAPI();
+            await gapi.client.init({
+                apiKey: 'YOUR_API_KEY',
+                clientId: 'YOUR_CLIENT_ID',
+                scope: 'https://www.googleapis.com/auth/cloud-platform'
+            });
+        }
+
+        async function uploadDicomCD() {
+            const projectId = 'your-project-id';
+            const cloudRegion = 'us-central1';
+            const datasetId = 'your-dataset-id';
+            const dicomStoreId = 'your-dicom-store-id';
+            const parent = `projects/${projectId}/locations/${cloudRegion}/datasets/${datasetId}/dicomStores/${dicomStoreId}`;
+            const dicomWebPath = 'studies';
+
+            const fileInput = document.getElementById('folderInput');
+            const files = Array.from(fileInput.files);
+
+            const dicomFiles = files.filter(file => 
+                file.name.toLowerCase().endsWith('.dcm') || 
+                file.name.toLowerCase() === 'dicomdir'
+            );
+
+            for (const file of dicomFiles) {
+                await uploadDicomFile(parent, dicomWebPath, file);
+            }
+
+            console.log('All DICOM files uploaded successfully');
+        }
+
+        async function uploadDicomFile(parent, dicomWebPath, file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const base64Data = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+
+                const response = await healthcare.projects.locations.datasets.dicomStores.storeInstances({
+                    parent: parent,
+                    dicomWebPath: dicomWebPath,
+                    resource: base64Data
+                });
+
+                console.log(`Uploaded: ${file.name}`);
+                console.log('Stored DICOM instance:', response.result);
+            } catch (error) {
+                console.error(`Error uploading file ${file.name}:`, error);
+            }
+        }
+
+        // Initialize the client when the page loads
+        initClient().catch(console.error);
+    </script>
+</body>
+</html>
