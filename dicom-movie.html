@@ -26,6 +26,7 @@
     <div id="dicomViewer"></div>
     <div id="status"></div>
     <script>
+         if (!crossOriginIsolated) SharedArrayBuffer = ArrayBuffer;
         let currentImageIndex = 0;
         let dicomFiles = [];
         const element = document.getElementById('dicomViewer');
