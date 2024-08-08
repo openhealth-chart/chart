@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/cornerstone-tools"></script>
     <script src="https://unpkg.com/cornerstone-wado-image-loader"></script>
     <script src="https://unpkg.com/dicom-parser"></script>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.9.8/dist/ffmpeg.min.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
     <style>
         #dicomViewer { width: 512px; height: 512px; margin: 20px auto; }
         #controls { text-align: center; margin-bottom: 20px; }
@@ -115,11 +115,11 @@
 
         async function createMovieFromImages(images) {
             // Ensure FFmpeg is loaded
-            if (typeof ffmpeg === 'undefined') {
+            if (typeof FFmpeg === 'undefined') {
                 statusElement.textContent = "Loading FFmpeg...";
                 await new Promise(resolve => {
                     const checkFFmpeg = () => {
-                        if (typeof ffmpeg !== 'undefined') {
+                        if (typeof FFmpeg !== 'undefined') {
                             resolve();
                         } else {
                             setTimeout(checkFFmpeg, 100);
@@ -129,24 +129,23 @@
                 });
             }
 
-            const { createWorker } = ffmpeg;
-            const worker = createWorker();
-            await worker.load();
-
-            // Write JPEG images to FFmpeg's virtual file system
+            const { createFFmpeg } = FFmpeg;
+            const ffmpeg = createFFmpeg({ log: true });
+            
+            await ffmpeg.load();
+            
             for (let i = 0; i < images.length; i++) {
                 const imageName = `image${i.toString().padStart(3, '0')}.jpg`;
-                await worker.write(imageName, images[i]);
+                const response = await fetch(images[i]);
+                const data = await response.arrayBuffer();
+                ffmpeg.FS('writeFile', imageName, new Uint8Array(data));
                 statusElement.textContent = `Processing image ${i + 1} of ${images.length} for video`;
             }
-
-            // Run FFmpeg command to create video
-            statusElement.textContent = "Creating video...";
-            await worker.run('-framerate 10 -i image%03d.jpg -c:v libx264 -pix_fmt yuv420p output.mp4');
-
-            // Read the resulting video file
-            const { data } = await worker.read('output.mp4');
-
+            
+            await ffmpeg.run('-framerate', '10', '-i', 'image%03d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4');
+            
+            const data = ffmpeg.FS('readFile', 'output.mp4');
+            
             // Create a download link for the video
             const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
             const videoUrl = URL.createObjectURL(videoBlob);
@@ -154,8 +153,7 @@
             link.href = videoUrl;
             link.download = 'dicom_series_movie.mp4';
             link.click();
-
-            await worker.terminate();
+            
             statusElement.textContent = "Video created and download started";
         }
 
