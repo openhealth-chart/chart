@@ -24,23 +24,14 @@
     </div>
     <div id="dicomViewer"></div>
     <div id="status"></div>
-    <script>
+    <script type="module">
+        import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js';
+
         let currentImageIndex = 0;
         let dicomFiles = [];
         const element = document.getElementById('dicomViewer');
         const statusElement = document.getElementById('status');
         cornerstone.enable(element);
-
-        // Load FFmpeg script
-        function loadFFmpegScript() {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://unpkg.com/@ffmpeg/ffmpeg@0.9.8/dist/ffmpeg.min.js';
-                script.onload = () => resolve();
-                script.onerror = () => reject(new Error('Failed to load FFmpeg script'));
-                document.head.appendChild(script);
-            });
-        }
 
         // File input handler
         document.getElementById('fileInput').addEventListener('change', async function(e) {
@@ -125,35 +116,23 @@
 
         async function createMovieFromImages(images) {
             try {
-                statusElement.textContent = "Loading FFmpeg...";
-                await loadFFmpegScript();
-                
-                if (typeof ffmpeg === 'undefined') {
-                    throw new Error('FFmpeg failed to load');
-                }
-
                 statusElement.textContent = "Initializing FFmpeg...";
-                const { createWorker } = ffmpeg;
-                const worker = createWorker({
-                    logger: ({ message }) => {
-                        console.log(message);
-                        statusElement.textContent = `FFmpeg: ${message}`;
-                    }
-                });
-
-                await worker.load();
+                const ffmpeg = createFFmpeg({ log: true });
+                
+                statusElement.textContent = "Loading FFmpeg...";
+                await ffmpeg.load();
                 
                 for (let i = 0; i < images.length; i++) {
                     const imageName = `image${i.toString().padStart(3, '0')}.jpg`;
-                    await worker.write(imageName, images[i]);
+                    ffmpeg.FS('writeFile', imageName, await fetchFile(images[i]));
                     statusElement.textContent = `Processing image ${i + 1} of ${images.length} for video`;
                 }
 
                 statusElement.textContent = "Creating video...";
-                await worker.run('-framerate 10 -i image%03d.jpg -c:v libx264 -pix_fmt yuv420p output.mp4');
+                await ffmpeg.run('-framerate', '10', '-i', 'image%03d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4');
 
                 statusElement.textContent = "Reading video data...";
-                const { data } = await worker.read('output.mp4');
+                const data = ffmpeg.FS('readFile', 'output.mp4');
 
                 // Create a download link for the video
                 const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
@@ -163,7 +142,6 @@
                 link.download = 'dicom_series_movie.mp4';
                 link.click();
 
-                await worker.terminate();
                 statusElement.textContent = "Video created and download started";
             } catch (error) {
                 console.error('Error in createMovieFromImages:', error);
