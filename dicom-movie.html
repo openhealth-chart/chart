@@ -137,7 +137,11 @@
                     logger: ({ message }) => {
                         console.log("FFmpeg Log:", message);
                         statusElement.textContent = `FFmpeg: ${message}`;
-                    }
+                    },
+                    mainName: 'main',
+                    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+                    wasmPath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm',
+                    workerPath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.worker.js',
                 });
                 
                 console.log("Loading FFmpeg");
@@ -176,7 +180,7 @@
                 console.error('Error in createMovieFromImages:', error);
                 statusElement.textContent = `Error: ${error.message}. Check console for details.`;
             }
-        }
+}
 
         // Initialize cornerstone WADO image loader
         cornerstoneWADOImageLoader.external.cornerstone = cornerstone;
