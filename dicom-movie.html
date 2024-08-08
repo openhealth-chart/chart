@@ -8,7 +8,7 @@
     <script src="https://unpkg.com/cornerstone-tools"></script>
     <script src="https://unpkg.com/cornerstone-wado-image-loader"></script>
     <script src="https://unpkg.com/dicom-parser"></script>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
     <style>
         #dicomViewer { width: 512px; height: 512px; margin: 20px auto; }
         #controls { text-align: center; margin-bottom: 20px; }
@@ -25,9 +25,7 @@
     </div>
     <div id="dicomViewer"></div>
     <div id="status"></div>
-    <script type="module">
-        import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js';
-
+    <script>
         let currentImageIndex = 0;
         let dicomFiles = [];
         const element = document.getElementById('dicomViewer');
@@ -116,6 +114,22 @@
         });
 
         async function createMovieFromImages(images) {
+            // Ensure FFmpeg is loaded
+            if (typeof FFmpeg === 'undefined') {
+                statusElement.textContent = "Loading FFmpeg...";
+                await new Promise(resolve => {
+                    const checkFFmpeg = () => {
+                        if (typeof FFmpeg !== 'undefined') {
+                            resolve();
+                        } else {
+                            setTimeout(checkFFmpeg, 100);
+                        }
+                    };
+                    checkFFmpeg();
+                });
+            }
+
+            const { createFFmpeg, fetchFile } = FFmpeg;
             const ffmpeg = createFFmpeg({ log: true });
             await ffmpeg.load();
 
