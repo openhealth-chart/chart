@@ -25,7 +25,7 @@
     <div id="dicomViewer"></div>
     <div id="status"></div>
     <script type="module">
-        import { createFFmpeg, fetchFile } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js';
+        import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js';
 
         let currentImageIndex = 0;
         let dicomFiles = [];
@@ -117,22 +117,24 @@
         async function createMovieFromImages(images) {
             try {
                 statusElement.textContent = "Initializing FFmpeg...";
-                const ffmpeg = createFFmpeg({ log: true });
+                const ffmpeg = new FFmpeg();
                 
                 statusElement.textContent = "Loading FFmpeg...";
                 await ffmpeg.load();
                 
                 for (let i = 0; i < images.length; i++) {
                     const imageName = `image${i.toString().padStart(3, '0')}.jpg`;
-                    ffmpeg.FS('writeFile', imageName, await fetchFile(images[i]));
+                    const response = await fetch(images[i]);
+                    const imageData = await response.arrayBuffer();
+                    await ffmpeg.writeFile(imageName, new Uint8Array(imageData));
                     statusElement.textContent = `Processing image ${i + 1} of ${images.length} for video`;
                 }
 
                 statusElement.textContent = "Creating video...";
-                await ffmpeg.run('-framerate', '10', '-i', 'image%03d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4');
+                await ffmpeg.exec(['-framerate', '10', '-i', 'image%03d.jpg', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', 'output.mp4']);
 
                 statusElement.textContent = "Reading video data...";
-                const data = ffmpeg.FS('readFile', 'output.mp4');
+                const data = await ffmpeg.readFile('output.mp4');
 
                 // Create a download link for the video
                 const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
