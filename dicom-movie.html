@@ -115,7 +115,7 @@
         });
 
         async function createMovieFromImages(images) {
-            if (typeof FFmpeg === 'undefined') {
+            while (typeof FFmpeg === 'undefined') {
                 statusElement.textContent = "Loading FFmpeg...";
                 await new Promise(resolve => {
                     const checkFFmpeg = () => {
@@ -139,9 +139,7 @@
                         statusElement.textContent = `FFmpeg: ${message}`;
                     },
                     mainName: 'main',
-                    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.6/dist/ffmpeg-core.js',
-                    wasmPath: 'https://unpkg.com/@ffmpeg/core@0.11.6/dist/ffmpeg-core.wasm',
-                    workerPath: 'https://unpkg.com/@ffmpeg/core@0.11.6/dist/ffmpeg-core.worker.js',
+                    corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.6/dist/ffmpeg-core.js'
                 });
                 
                 console.log("Loading FFmpeg");
