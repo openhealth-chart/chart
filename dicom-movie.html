@@ -31,7 +31,20 @@
         const element = document.getElementById('dicomViewer');
         const statusElement = document.getElementById('status');
         cornerstone.enable(element);
-
+        if (typeof SharedArrayBuffer === 'undefined') {
+            class SharedArrayBuffer {
+                constructor(length) {
+                    this.buffer = new ArrayBuffer(length);
+                }
+                get byteLength() {
+                    return this.buffer.byteLength;
+                }
+                slice(begin, end) {
+                    return this.buffer.slice(begin, end);
+                }
+            }
+            window.SharedArrayBuffer = SharedArrayBuffer;
+        }
         // File input handler
         document.getElementById('fileInput').addEventListener('change', async function(e) {
             statusElement.textContent = "Processing files...";
