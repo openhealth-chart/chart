@@ -21,7 +21,7 @@ export function sendRequest(url, data, accessToken, taskId,responseHandler = han
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer ${accessToken}',
+                    'Authorization': `Bearer ${accessToken}`,
                     'X-Chart-Task': taskId,
                     'Content-Type': 'application/json',
                 },
