@@ -2,19 +2,7 @@
 function appendPath(url, path) {
     return url.endsWith('/') ? url + path : url + '/' + path;
     }
-function submitForm(form, url,accessToken,taskId) {
-    chartRecorder.showLoading();
 
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    
-    const procedures = document.getElementById('procedures');
-        data.procedures = procedures.value.split(/[\n,]/).filter(line => line.trim() !== '');
-        data.icd10_codes = Array.from(document.querySelectorAll('input[name="icd10_codes"]:checked')).map(checkbox => checkbox.value);
-        data.cpt_codes = Array.from(document.querySelectorAll('input[name="cpt_codes"]:checked')).map(checkbox => checkbox.value);
-
-        sendRequest(url, data,accessToken,taskId);
-    }
 function submitQuestion(form, url,loc,accessToken,taskId) {
     chartRecorder.showLoading();
 
@@ -49,6 +37,7 @@ function sendRequest(url, data, accessToken, taskId,responseHandler = handleForm
 }
 
     function handleFormResponse(html) {
+        console.log("response:",html);
         document.open();
         document.write(html);
         document.close();
