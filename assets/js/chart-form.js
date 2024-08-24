@@ -2,9 +2,17 @@
 export function appendPath(url, path) {
     return url.endsWith('/') ? url + path : url + '/' + path;
     }
-
+export function submitForm(form, url,accessToken,taskId) {
+        if (typeof chartRecorder !== 'undefined' && chartRecorder.showLoading) {
+            chartRecorder.showLoading();
+        }
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        sendRequest(data, url,accessToken, taskId);
+    }
 export function submitQuestion(form, url,loc,accessToken,taskId) {
-    chartRecorder.showLoading();
+    if (typeof chartRecorder !== 'undefined' && chartRecorder.showLoading)
+        chartRecorder.showLoading();
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
@@ -37,7 +45,8 @@ export function sendRequest(url, data, accessToken, taskId,responseHandler = han
                 .then(responseHandler)
                 .catch(handleError)
                 .finally(() => {
-                    chartRecorder.hideLoading();
+                    if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading)
+                        chartRecorder.hideLoading();
                 });
 }
 
