@@ -2,7 +2,7 @@
 function appendPath(url, path) {
     return url.endsWith('/') ? url + path : url + '/' + path;
     }
-function submitForm(form, url) {
+function submitForm(form, url,accessToken,taskId) {
     chartRecorder.showLoading();
 
     const formData = new FormData(form);
@@ -13,9 +13,9 @@ function submitForm(form, url) {
         data.icd10_codes = Array.from(document.querySelectorAll('input[name="icd10_codes"]:checked')).map(checkbox => checkbox.value);
         data.cpt_codes = Array.from(document.querySelectorAll('input[name="cpt_codes"]:checked')).map(checkbox => checkbox.value);
 
-        sendRequest(url, data);
+        sendRequest(url, data,accessToken,taskId);
     }
-function submitQuestion(form, url,loc) {
+function submitQuestion(form, url,loc,accessToken,taskId) {
     chartRecorder.showLoading();
 
     const formData = new FormData(form);
@@ -25,16 +25,16 @@ function submitQuestion(form, url,loc) {
         appendQuestion(conversation, form.codingQuestion.value);
         form.codingQuestion.value = '';
 
-        sendRequest(appendPath(url,loc), data, handleQuestionResponse);
+        sendRequest(appendPath(url,loc), data,accessToken,taskId, handleQuestionResponse);
     }
 
-function sendRequest(url, data, responseHandler = handleFormResponse) {
+function sendRequest(url, data, accessToken, taskId,responseHandler = handleFormResponse) {
             console.log(`Submitting to ${url}:`, JSON.stringify(data));
             fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'Bearer {{accessToken}}',
-                    'X-Chart-Task': '{{context.taskId}}',
+                    'Authorization': 'Bearer ${accessToken}',
+                    'X-Chart-Task': taskId,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(data),
