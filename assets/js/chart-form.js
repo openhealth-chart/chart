@@ -13,10 +13,10 @@ export function submitQuestion(form, url,loc,accessToken,taskId) {
         appendQuestion(conversation, form.codingQuestion.value);
         form.codingQuestion.value = '';
 
-        sendRequest(appendPath(url,loc), data,accessToken,taskId, handleQuestionResponse);
+        sendRequest(appendPath(url,loc), data,accessToken,taskId, handleQuestionResponse, 'application/json');
     }
 
-export function sendRequest(url, data, accessToken, taskId,responseHandler = handleFormResponse) {
+export function sendRequest(url, data, accessToken, taskId,responseHandler = handleFormResponse, responseType = 'text/html') {
             console.log(`Submitting to ${url}:`, JSON.stringify(data));
             fetch(url, {
                 method: 'POST',
@@ -28,7 +28,12 @@ export function sendRequest(url, data, accessToken, taskId,responseHandler = han
                 body: JSON.stringify(data),
                 credentials: 'include'
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (responseType == 'application/json' {
+                        return response.json();
+                    } else {
+                        return response.text();
+                    })
                 .then(responseHandler)
                 .catch(handleError)
                 .finally(() => {
