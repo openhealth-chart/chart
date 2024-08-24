@@ -56,6 +56,7 @@ function sendRequest(url, data, accessToken, taskId,responseHandler = handleForm
 
     function handleQuestionResponse(result) {
         let responseText = typeof result === 'string' ? JSON.parse(result).answer || result : JSON.stringify(result);
+        console.log('Received response:', responseText);
         appendResponse(document.getElementById('conversation'), responseText);
     }
 
