@@ -21,31 +21,45 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
     sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
 }
 
-export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
+export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
     console.log(`Submitting to ${url}:`, JSON.stringify(data));
     showLoading();
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'X-Chart-Task': taskId,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-        credentials: 'include'
-    })
-        .then(response => {
-            if (responseType === 'application/json') {
-                return response.json();
-            } else {
-                return response.text();
-            }
-        })
-        .then(responseHandler)
-        .catch(handleError)
-        .finally(() => {
-            hideLoading();
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'X-Chart-Task': taskId,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            credentials: 'include',
+            // Note: We're not setting redirect: 'manual' here
         });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Check if the response URL is different from the original URL
+        if (response.url !== url) {
+            console.log(`Request was redirected to: ${response.url}`);
+        }
+
+        let responseData;
+        if (responseType === 'application/json') {
+            responseData = await response.json();
+        } else {
+            responseData = await response.text();
+        }
+
+        responseHandler(responseData);
+    } catch (error) {
+        handleError(error);
+    } finally {
+        hideLoading();
+    }
 }
 
 export function handleFormResponse(html) {
