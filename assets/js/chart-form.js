@@ -41,14 +41,13 @@ export function sendRequest(url, data, accessToken, taskId,responseHandler = han
                         return response.json();
                     } else {
                         return response.text();
-                    })
-                .then(responseHandler)
+                    }})
+                .then(responseHandler) 
                 .catch(handleError)
                 .finally(() => {
                     if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading)
                         chartRecorder.hideLoading();
                 });
-            )
         }
 
 export  function handleFormResponse(html) {
