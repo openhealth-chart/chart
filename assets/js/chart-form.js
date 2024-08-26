@@ -48,7 +48,8 @@ export function sendRequest(url, data, accessToken, taskId,responseHandler = han
                     if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading)
                         chartRecorder.hideLoading();
                 });
-}
+            )
+        }
 
 export  function handleFormResponse(html) {
         console.log("response:",html);
