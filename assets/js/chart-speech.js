@@ -390,15 +390,6 @@ export class ChartRecorder {
     elem.scrollTop = scrollTop;
   }
 
-  showLoading() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.style.display = 'flex';
-  }
-
-  hideLoading() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) overlay.style.display = 'none';
-  }
 
   async sendPdfToGoogleCloudOcr(pdfFile, apiKey) {
     // Base64 encode the PDF file

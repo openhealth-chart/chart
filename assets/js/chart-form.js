@@ -3,18 +3,13 @@ export function appendPath(url, path) {
 }
 
 export function submitForm(form, url, accessToken, taskId) {
-    if (typeof chartRecorder !== 'undefined' && chartRecorder.showLoading) {
-        chartRecorder.showLoading();
-    }
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     sendRequest(url, data, accessToken, taskId);
 }
 
 export function submitQuestion(form, url, loc, accessToken, taskId) {
-    if (typeof chartRecorder !== 'undefined' && chartRecorder.showLoading) {
-        chartRecorder.showLoading();
-    }
 
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
@@ -28,6 +23,7 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
 
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
     console.log(`Submitting to ${url}:`, JSON.stringify(data));
+    showLoading();
     fetch(url, {
         method: 'POST',
         headers: {
@@ -48,9 +44,7 @@ export function sendRequest(url, data, accessToken, taskId, responseHandler = ha
         .then(responseHandler)
         .catch(handleError)
         .finally(() => {
-            if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading) {
-                chartRecorder.hideLoading();
-            }
+            hideLoading();
         });
 }
 
@@ -85,3 +79,12 @@ function appendResponse(conversation, response) {
     responseElement.textContent = response;
     conversation.appendChild(responseElement);
 }
+export function showLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'flex';
+  }
+
+ export function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.style.display = 'none';
+  }
