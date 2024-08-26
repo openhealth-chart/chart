@@ -24,31 +24,32 @@ export function submitQuestion(form, url,loc,accessToken,taskId) {
         sendRequest(appendPath(url,loc), data,accessToken,taskId, handleQuestionResponse, 'application/json');
     }
 
-export function sendRequest(url, data, accessToken, taskId,responseHandler = handleFormResponse, responseType = 'text/html') {
-            console.log(`Submitting to ${url}:`, JSON.stringify(data));
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
-                    'X-Chart-Task': taskId,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-                credentials: 'include'
+    export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
+        console.log(`Submitting to ${url}:`, JSON.stringify(data));
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'X-Chart-Task': taskId,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            credentials: 'include'
+        })
+            .then(response => {
+                if (responseType === 'application/json') {
+                    return response.json();
+                } else {
+                    return response.text();
+                }
             })
-                .then(response => {
-                    if (responseType == 'application/json' {
-                        return response.json();
-                    } else {
-                        return response.text();
-                    }})
-                .then(responseHandler) 
-                .catch(handleError)
-                .finally(() => {
-                    if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading)
-                        chartRecorder.hideLoading();
-                });
-        }
+            .then(responseHandler) 
+            .catch(handleError)
+            .finally(() => {
+                if (typeof chartRecorder !== 'undefined' && chartRecorder.hideLoading)
+                    chartRecorder.hideLoading();
+            });
+    }
 
 export  function handleFormResponse(html) {
         console.log("response:",html);
