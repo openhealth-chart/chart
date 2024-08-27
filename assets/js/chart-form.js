@@ -3,7 +3,7 @@ export function appendPath(url, path) {
 }
 
 export function submitForm(form, url, accessToken, taskId) {
-
+    console.log("chart-form::submitForm:",url);
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     sendRequest(url, data, accessToken, taskId);
@@ -22,7 +22,7 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
 }
 
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
-    console.log(`Submitting to ${url}:`, JSON.stringify(data));
+    console.log(`chart-form::sendRequest to ${url}:`, JSON.stringify(data,null,2));
     showLoading();
 
         fetch(url, {
