@@ -8,15 +8,13 @@ export function submitForm(form, url, accessToken, taskId) {
     const data = Object.fromEntries(formData.entries());
     sendRequest(url, data, accessToken, taskId);
 }
-
 export function submitQuestion(form, url, loc, accessToken, taskId) {
-
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
     const conversation = document.getElementById('conversation');
-    appendQuestion(conversation, form.codingQuestion.value);
-    form.codingQuestion.value = '';
+    appendQuestion(conversation, form.diagnosticQuestion.value);
+    form.diagnosticQuestion.value = '';
 
     sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
 }
