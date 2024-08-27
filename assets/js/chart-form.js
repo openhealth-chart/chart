@@ -64,7 +64,11 @@ export function handleFormResponse(html) {
 }
 
 export function handleQuestionResponse(result) {
-    let responseText = typeof result === 'string' ? JSON.parse(result).answer || result : JSON.stringify(result);
+    let responseText;
+    if (typeof result === 'string')
+        responseText = JSON.parse(result).answer || result;
+    else
+        responseText = (result.answer) ? JSON.stringify(result.answer) : JSON.stringify(result);
     console.log('Received response:', responseText);
     appendResponse(document.getElementById('conversation'), responseText);
 }
