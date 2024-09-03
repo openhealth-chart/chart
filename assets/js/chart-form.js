@@ -19,7 +19,9 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
     sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
 }
 // data determined by taskId
-export function submitUMLSMapping(form,url, loc, accessToken, taskId) {
+let CHART_umls_mapping_element;
+export function submitUMLSMapping(form,url, loc, accessToken, taskId, elId = 'UMLSMappingResult') {
+    CHART_umls_mapping_element = document.getElementById(elId);
     sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
 }
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
@@ -81,9 +83,8 @@ export function handleUMLSMappingResponse(result) {
         response = JSON.parse(result) || result;
     else
         response = result
-    console.log('Received response:', response);
-    const umlsEl = document.getElementById('UMLSMappingResult');
-    umlsEl.innerHTML = jsonToHtml(response,'section-content');
+    console.log('Received response:', response); 
+    CHART_umls_mapping_element.innerHTML = jsonToHtml(response,'section-content');
 }
 export function handleError(error) {
     console.error('Error:', error);
