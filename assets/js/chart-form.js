@@ -18,7 +18,10 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
 
     sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
 }
-
+// data determined by taskId
+export function submitUMLSMapping(url, loc, accessToken, taskId) {
+    sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
+}
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
     console.log(`chart-form::sendRequest to ${url}:`, JSON.stringify(data,null,2));
     showLoading();
@@ -72,10 +75,20 @@ export function handleQuestionResponse(result) {
     console.log('Received response:', responseText);
     appendResponse(document.getElementById('conversation'), responseText);
 }
-
+export function handleUMLSMappingResponse(result) {
+    let response;
+    if (typeof result === 'string')
+        response = JSON.parse(result) || result;
+    else
+        response = result
+    console.log('Received response:', response);
+    const umlsEl = document.getElementById('UMLSMappingResult');
+    umlsEl.innerHTML = JSON.stringify(response, null, 2);
+}
 export function handleError(error) {
     console.error('Error:', error);
     alert('An error occurred: ' + error.message);
+    location.reload();
 }
 
 function appendQuestion(conversation, question) {
