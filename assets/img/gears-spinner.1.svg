@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #0a02ff;
+        stroke-linecap: round;
+        stroke-width: 15px;
+      }
+    </style>
+  </defs>
+  <!-- Generator: Adobe Illustrator 28.6.0, SVG Export Plug-In . SVG Version: 1.2.0 Build 709)  -->
+  <g>
+    <g id="Layer_1">
+      <path class="cls-1" d="M70,95.5v16.5M70,28v16.5M70,44.5c-14.1,0-25.5,11.4-25.5,25.5s11.4,25.5,25.5,25.5,25.5-11.4,25.5-25.5-11.4-25.5-25.5-25.5ZM106.4,49l-14.4,8.3M33.6,91l14.4-8.3M48,57.2l-14.4-8.2M92.1,82.8l14.3,8.2">
+        <animateTransform accumulate="none" additive="replace" attributeName="transform" calcMode="spline" dur="2" fill="remove" keySplines="0 0 1 1" keyTimes="0;1" repeatCount="indefinite" restart="always" type="rotate" values="0;-120"/>
+      </path>
+      <path class="cls-1" d="M130,155.5v16.5M130,88v16.5M130,104.5c-14.1,0-25.5,11.4-25.5,25.5s11.4,25.5,25.5,25.5,25.5-11.4,25.5-25.5-11.4-25.5-25.5-25.5ZM166.4,109l-14.3,8.3M93.6,151l14.3-8.3M107.9,117.3l-14.3-8.3M152.1,142.8l14.3,8.2">
+        <animateTransform accumulate="none" additive="replace" attributeName="transform" calcMode="spline" dur="2" fill="remove" keySplines="0 0 1 1" keyTimes="0;1" repeatCount="indefinite" restart="always" type="rotate" values="0;120"/>
+      </path>
+    </g>
+  </g>
+</svg>
