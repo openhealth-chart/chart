@@ -21,6 +21,7 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
 // data determined by taskId
 let CHART_umls_mapping_element;
 export function submitUMLSMapping(form,url, loc, accessToken, taskId, elId = 'UMLSMappingResult') {
+    console.log("chart-form::submitUMLSMapping:",url);
     CHART_umls_mapping_element = document.getElementById(elId);
     sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
 }
@@ -84,7 +85,7 @@ export function handleUMLSMappingResponse(result) {
     else
         response = result
     console.log('Received response:', response); 
-    CHART_umls_mapping_element.innerHTML = jsonToHtml(response,'section-content');
+    CHART_umls_mapping_element.innerHTML = jsonToHtml((typeof response)==='object')? response.UMLS : response,'section-content');
 }
 export function handleError(error) {
     console.error('Error:', error);
