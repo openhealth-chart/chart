@@ -127,7 +127,7 @@ export function showLoading() {
         html += '<ul>';
         for (let key in json) {
             if (json.hasOwnProperty(key)) {
-                html += `<li><span class="key">${key}:</span> ${jsonToHtml(json[key]),classname}</li>`;
+                html += `<li><span class="key">${key}:</span> ${jsonToHtml(json[key],classname)}</li>`;
             }
         }
         html += '</ul>';
