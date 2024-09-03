@@ -113,14 +113,14 @@ export function showLoading() {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) overlay.style.display = 'none';
   }
-  export function jsonToHtml(json,classname){
+  export function jsonToHtml(json,classname = 'section-content'){
     if (typeof json === 'string')
         return json;
     let html = '<div class="'+classname+'">';
     if (Array.isArray(json)) {
         html += '<ul>';
         json.forEach(item => {
-            html += `<li>${jsonToHtml(item)}</li>`;
+            html += `<li>${jsonToHtml(item,classname)}</li>`;
         });
         html += '</ul>';
     } else if (typeof json === 'object' && json !== null) {
