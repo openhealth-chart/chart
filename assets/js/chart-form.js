@@ -85,7 +85,7 @@ export function handleUMLSMappingResponse(result) {
     else
         response = result
     console.log('Received response:', response); 
-    CHART_umls_mapping_element.innerHTML = jsonToHtml((typeof response)==='object')? response.UMLS : response,'section-content');
+    CHART_umls_mapping_element.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
 }
 export function handleError(error) {
     console.error('Error:', error);
