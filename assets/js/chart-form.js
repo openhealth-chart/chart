@@ -19,7 +19,7 @@ export function submitQuestion(form, url, loc, accessToken, taskId) {
     sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
 }
 // data determined by taskId
-export function submitUMLSMapping(url, loc, accessToken, taskId) {
+export function submitUMLSMapping(form,url, loc, accessToken, taskId) {
     sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
 }
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
