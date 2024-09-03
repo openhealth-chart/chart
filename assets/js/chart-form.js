@@ -83,7 +83,7 @@ export function handleUMLSMappingResponse(result) {
         response = result
     console.log('Received response:', response);
     const umlsEl = document.getElementById('UMLSMappingResult');
-    umlsEl.innerHTML = JSON.stringify(response, null, 2);
+    umlsEl.innerHTML = jsonToHtml(response,'section-content');
 }
 export function handleError(error) {
     console.error('Error:', error);
@@ -112,4 +112,28 @@ export function showLoading() {
  export function hideLoading() {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) overlay.style.display = 'none';
+  }
+  export function jsonToHtml(json,classname){
+    if (typeof json === 'string')
+        return json;
+    let html = '<div class="'+classname+'">';
+    if (Array.isArray(json)) {
+        html += '<ul>';
+        json.forEach(item => {
+            html += `<li>${jsonToHtml(item)}</li>`;
+        });
+        html += '</ul>';
+    } else if (typeof json === 'object' && json !== null) {
+        html += '<ul>';
+        for (let key in json) {
+            if (json.hasOwnProperty(key)) {
+                html += `<li><span class="key">${key}:</span> ${jsonToHtml(json[key]),classname}</li>`;
+            }
+        }
+        html += '</ul>';
+    } else {
+        html += json;
+    }
+    html += '</div>';
+    return html;
   }
