@@ -8,21 +8,13 @@ export function submitForm(form, url, accessToken, taskId) {
     const data = Object.fromEntries(formData.entries());
     sendRequest(url, data, accessToken, taskId);
 }
-export function submitQuestion(form, url, loc, accessToken, taskId) {
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    
-    const conversation = document.getElementById('conversation');
-    appendQuestion(conversation, form.diagnosticQuestion.value);
-    form.diagnosticQuestion.value = '';
-
-    sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
-}
 // data determined by taskId
-let CHART_umls_mapping_element;
-export function submitUMLSMapping(form,url, loc, accessToken, taskId, elId = 'UMLSMappingResult') {
+let CHART_umls_display_element;
+let CHART_umls_element;
+export function submitUMLSMapping(form,url, loc, accessToken, taskId, elId = 'UMLSMappingResult',elResId = 'UMLSResult') {
     console.log("chart-form::submitUMLSMapping:",url);
-    CHART_umls_mapping_element = document.getElementById(elId);
+    CHART_umls_display_element = document.getElementById(elId);
+    CHART_umls_element = document.getElementById(elResId);
     sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
 }
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
@@ -36,7 +28,7 @@ export function sendRequest(url, data, accessToken, taskId, responseHandler = ha
                 'X-Chart-Task': taskId,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: (typeof data === 'object') ? JSON.stringify(data) : data,
             credentials: 'include',
             // Note: We're not setting redirect: 'manual' here
         })
@@ -85,7 +77,13 @@ export function handleUMLSMappingResponse(result) {
     else
         response = result
     console.log('Received response:', response); 
-    CHART_umls_mapping_element.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
+    if (CHART_umls_display_element) {
+        const responseElement = document.createElement('p');
+        responseElement.textContent = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
+        CHART_umls_display_element.appendChild(responseElement);
+    }
+    //CHART_umls_display_element.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
+    if (CHART_umls_element) CHART_umls_element.innerHTML = JSON.stringify(response);
 }
 export function handleError(error) {
     console.error('Error:', error);
