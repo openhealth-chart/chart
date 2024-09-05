@@ -18,7 +18,7 @@ export function submitUMLSMapping(form,url, loc, accessToken, taskId, elId = 'UM
     sendRequest(appendPath(url, loc), {}, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
 }
 export function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
-    console.log(`chart-form::sendRequest to ${url}:`, JSON.stringify(data,null,2));
+    console.log(`chart-form::sendRequest to ${url}:`, (typeof data === 'object') ? JSON.stringify(data,null,2) : data);
     showLoading();
 
         fetch(url, {
@@ -51,7 +51,6 @@ export function sendRequest(url, data, accessToken, taskId, responseHandler = ha
         .finally(() => {
             hideLoading();
         });
-
 }
 
 export function handleFormResponse(html) {
