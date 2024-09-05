@@ -8,7 +8,7 @@ export function submitForm(form, url, accessToken, taskId) {
     const data = Object.fromEntries(formData.entries());
     sendRequest(url, data, accessToken, taskId);
 }
-export function submitQuestion(form, url, loc, accessToken, taskId) {
+export function submitQuestion(form, url, loc, accessToken, taskId){
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     
@@ -88,7 +88,7 @@ export function handleUMLSMappingResponse(result) {
     console.log('Received response:', response); 
     if (CHART_umls_display_element) {
         const responseElement = document.createElement('p');
-        responseElement.textContent = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
+        responseElement.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
         CHART_umls_display_element.appendChild(responseElement);
     }
     //CHART_umls_display_element.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
