@@ -74,7 +74,7 @@ export function handleUMLSMappingResponse(result) {
     if (typeof result === 'string')
         response = JSON.parse(result) || result;
     else
-        response = result
+        response = result;
     console.log('Received response:', response); 
     if (CHART_umls_display_element) {
         const responseElement = document.createElement('p');
