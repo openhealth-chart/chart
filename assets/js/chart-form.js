@@ -16,7 +16,7 @@ export async function submitQuestion(form, url, loc, accessToken, taskId){
     appendQuestion(conversation, form.diagnosticQuestion.value);
     form.diagnosticQuestion.value = '';
 
-    await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse, 'application/json');
+    await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleQuestionResponse);
 }
 // data determined by taskId
 let CHART_umls_display_element;
@@ -25,9 +25,9 @@ export async function submitUMLSMapping(form,url, loc, accessToken, taskId, data
     console.log("chart-form::submitUMLSMapping:",url);
     CHART_umls_display_element = document.getElementById(elId);
     CHART_umls_element = document.getElementById(elResId);
-    await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleUMLSMappingResponse, 'application/json');
+    await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleUMLSMappingResponse);
 }
-export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, responseType = 'text/html') {
+export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse) {
     console.log(`chart-form::sendRequest to ${url}:`, (typeof data === 'object') ? JSON.stringify(data, null, 2) : data);
     showLoading();
 
@@ -47,7 +47,16 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const responseData = responseType === 'application/json' ? await response.json() : await response.text();
+        // Dynamically detect the response content type
+        const contentType = response.headers.get('content-type');
+        let responseData;
+
+        if (contentType && contentType.includes('application/json')) {
+            responseData = await response.json(); // Parse as JSON
+        } else {
+            responseData = await response.text(); // Parse as text (HTML or plain text)
+        }
+
         responseHandler(responseData);
 
     } catch (error) {
@@ -56,6 +65,7 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
         hideLoading();
     }
 }
+
 
 
 export function handleFormResponse(html) {
