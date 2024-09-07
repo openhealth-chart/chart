@@ -81,6 +81,8 @@ export function handleQuestionResponse(result) {
 }
 export function handleUMLSMappingResponse(result) {
     let response;
+    if (!CHART_umls_display_element) CHART_umls_display_element = document.getElementById("UMLSMappingResult");
+    if (!CHART_umls_element) CHART_umls_element = document.getElementById("UMLSResult");
     if (typeof result === 'string')
         response = JSON.parse(result) || result;
     else
@@ -88,7 +90,7 @@ export function handleUMLSMappingResponse(result) {
     console.log('Received response:', response); 
     if (CHART_umls_display_element) {
         const responseElement = document.createElement('p');
-        responseElement.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
+        responseElement.innerHTML = jsonToHtml(response,'section-content');
         CHART_umls_display_element.appendChild(responseElement);
     }
     //CHART_umls_display_element.innerHTML = jsonToHtml((typeof(response)==='object')? response.UMLS : response,'section-content');
