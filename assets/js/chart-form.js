@@ -68,11 +68,22 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
 
 
 
-export function handleFormResponse(html) {
-    console.log("response:", html);
-    document.open();
-    document.write(html);
-    document.close();
+export function handleFormResponse(response) {
+    console.log("response:", response);
+    // Check if the response contains valid HTML
+    if (typeof response === 'string' ) {
+        try {
+            // Clear the current document and write the response as new HTML
+            document.open();
+            document.write(response);
+            document.close();
+        } catch (error) {
+            console.error("Error while writing HTML to document:", error);
+        }
+    } else {
+        // Handle non-HTML responses or fallback for safety
+        console.log('Handling non-HTML response:', response);
+    }
 }
 
 export function handleQuestionResponse(result) {
