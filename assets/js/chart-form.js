@@ -29,6 +29,7 @@ export async function submitUMLSMapping(form,url, loc, accessToken, taskId, data
 }
 export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse) {
     console.log(`chart-form::sendRequest to ${url}:`, (typeof data === 'object') ? JSON.stringify(data, null, 2) : data);
+    console.log('task id:',taskId);
     showLoading();
 
     try {
@@ -36,7 +37,7 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'X-Chart-TaskId': taskId,
+                'X-Chart-Task': taskId,
                 'Content-Type': 'application/json',
             },
             body: (typeof data === 'object') ? JSON.stringify(data) : data,
@@ -70,7 +71,7 @@ async function pollForResult(url, accessToken, taskId, responseHandler, maxAttem
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
-                    'X-Chart-TaskId': taskId,
+                    'X-Chart-Task': taskId,
                 },
                 credentials: 'include',
             });
