@@ -45,9 +45,11 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
 
         if (response.status === 202) {
             // Task is queued, start polling
+            console.log("chart-form::sendRequest: task queued");
             await pollForResult(url, accessToken, taskId, responseHandler);
         } else if (response.ok) {
             // Process the response immediately
+            console.log("chart-form::sendRequest: task complete");
             await processResponse(response, responseHandler);
         } else {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -62,9 +64,8 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
 
 async function pollForResult(url, accessToken, taskId, responseHandler, maxAttempts = 30, interval = 2000) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        console.log(`chart-form::pollForResult: attempt ${attempt + 1} of ${maxAttempts}`);
         await new Promise(resolve => setTimeout(resolve, interval));
-
-        try {
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -76,19 +77,17 @@ async function pollForResult(url, accessToken, taskId, responseHandler, maxAttem
 
             if (response.status === 200) {
                 // Task is complete, process the response
+                console.log("chart-form::pollForResult: task complete");
                 await processResponse(response, responseHandler);
                 return;
             } else if (response.status !== 202) {
                 // Unexpected status, throw an error
+                console.log("chart-form::pollForResult: status:",response.status);
                 throw new Error(`Unexpected status during polling: ${response.status}`);
             }
             // If status is 202, continue polling
-        } catch (error) {
-            console.error('Error during polling:', error);
-            // Optionally, you might want to stop polling on certain errors
-        }
     }
-    throw new Error('Polling timed out');
+    throw new Error(`Polling timed out: ${maxAttempts} attempts`);
 }
 
 async function processResponse(response, responseHandler) {
