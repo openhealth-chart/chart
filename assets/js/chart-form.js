@@ -36,34 +36,72 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
-                'X-Chart-Task': taskId,
+                'X-Chart-TaskId': taskId,
                 'Content-Type': 'application/json',
             },
             body: (typeof data === 'object') ? JSON.stringify(data) : data,
             credentials: 'include',
         });
 
-        if (!response.ok) {
+        if (response.status === 202) {
+            // Task is queued, start polling
+            await pollForResult(url, accessToken, taskId, responseHandler);
+        } else if (response.ok) {
+            // Process the response immediately
+            await processResponse(response, responseHandler);
+        } else {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        // Dynamically detect the response content type
-        const contentType = response.headers.get('content-type');
-        let responseData;
-
-        if (contentType && contentType.includes('application/json')) {
-            responseData = await response.json(); // Parse as JSON
-        } else {
-            responseData = await response.text(); // Parse as text (HTML or plain text)
-        }
-
-        responseHandler(responseData);
 
     } catch (error) {
         handleError(error);
     } finally {
         hideLoading();
     }
+}
+
+async function pollForResult(url, accessToken, taskId, responseHandler, maxAttempts = 30, interval = 2000) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'X-Chart-TaskId': taskId,
+                },
+                credentials: 'include',
+            });
+
+            if (response.status === 200) {
+                // Task is complete, process the response
+                await processResponse(response, responseHandler);
+                return;
+            } else if (response.status !== 202) {
+                // Unexpected status, throw an error
+                throw new Error(`Unexpected status during polling: ${response.status}`);
+            }
+            // If status is 202, continue polling
+        } catch (error) {
+            console.error('Error during polling:', error);
+            // Optionally, you might want to stop polling on certain errors
+        }
+    }
+    throw new Error('Polling timed out');
+}
+
+async function processResponse(response, responseHandler) {
+    const contentType = response.headers.get('content-type');
+    let responseData;
+
+    if (contentType && contentType.includes('application/json')) {
+        responseData = await response.json();
+    } else {
+        responseData = await response.text();
+    }
+
+    responseHandler(responseData);
 }
 
 
