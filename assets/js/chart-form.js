@@ -30,10 +30,9 @@ export async function submitUMLSMapping(form,url, loc, accessToken, taskId, data
     await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleUMLSMappingResponse);
 }
 export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse) {
-    console.log(`chart-form::sendRequest to ${url}:`, (typeof data === 'object') ? JSON.stringify(data, null, 2) : data);
-    console.log('task id:',taskId);
     showLoading();
-
+    const stringBody = (typeof data === 'object') ? JSON.stringify(data) : data;
+    console.log(`chart-form::sendRequest to ${url}: ${stringBody}`);
     try {
         const response = await fetch(url, {
             method: 'POST',
@@ -42,7 +41,7 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
                 'X-Chart-Task': taskId,
                 'Content-Type': 'application/json',
             },
-            body: (typeof data === 'object') ? JSON.stringify(data) : data,
+            body: stringBody,
             credentials: 'include',
         });
 
