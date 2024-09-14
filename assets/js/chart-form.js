@@ -2,7 +2,7 @@ export function appendPath(url, path) {
     return url.endsWith('/') ? url + path : url + '/' + path;
 }
 
-export async function submitForm(form, url, data, accessToken, taskId) {
+export async function submitForm(form, url, accessToken, taskId) {
     console.log("chart-form::submitForm:",url);
     console.log("chart-form::submitForm:taskId:",taskId);
     console.log("chart-form::submitForm:accessToken:",accessToken);
