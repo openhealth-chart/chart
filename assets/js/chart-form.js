@@ -4,6 +4,8 @@ export function appendPath(url, path) {
 
 export async function submitForm(form, url, accessToken, taskId) {
     console.log("chart-form::submitForm:",url);
+    console.log("chart-form::submitForm:taskId:",taskId);
+    console.log("chart-form::submitForm:accessToken:",accessToken);
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
     await sendRequest(url, data, accessToken, taskId);
