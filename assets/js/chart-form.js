@@ -64,7 +64,7 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
     }
 }
 
-async function pollForResult(url, accessToken, taskId, responseHandler, maxAttempts = 30, interval = 2000) {
+async function pollForResult(url, accessToken, taskId, responseHandler, maxAttempts = 60, interval = 2000) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         console.log(`chart-form::pollForResult: attempt ${attempt + 1} of ${maxAttempts}`);
         await new Promise(resolve => setTimeout(resolve, interval));
