@@ -82,7 +82,10 @@ async function pollForResult(url, accessToken, taskId, responseHandler, maxAttem
                 console.log("chart-form::pollForResult: task complete");
                 await processResponse(response, responseHandler);
                 return;
-            } else if (response.status !== 202) {
+            } else if (response.status === 202) {
+                // Task is still in progress, continue polling
+                console.log("chart-form::pollForResult: task in progress:", response.json()?.message);
+            } else  {
                 // Unexpected status, throw an error
                 console.log("chart-form::pollForResult: status:",response.status);
                 throw new Error(`Unexpected status during polling: ${response.status}`);
