@@ -29,7 +29,7 @@ export async function submitUMLSMapping(form,url, loc, accessToken, taskId, data
     CHART_umls_element = document.getElementById(elResId);
     await sendRequest(appendPath(url, loc), data, accessToken, taskId, handleUMLSMappingResponse);
 }
-export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse) {
+export async function sendRequest(url, data, accessToken, taskId, responseHandler = handleFormResponse, maxAttempts = 60, interval = 2000) {
     showLoading();
     const stringBody = (typeof data === 'object') ? JSON.stringify(data) : data;
     console.log(`chart-form::sendRequest to ${url}: ${stringBody}`);
@@ -48,7 +48,7 @@ export async function sendRequest(url, data, accessToken, taskId, responseHandle
         if (response.status === 202) {
             // Task is queued, start polling
             console.log("chart-form::sendRequest: task queued");
-            await pollForResult(url, accessToken, taskId, responseHandler);
+            await pollForResult(url, accessToken, taskId, responseHandler, maxAttempts, interval);
         } else if (response.ok) {
             // Process the response immediately
             console.log("chart-form::sendRequest: task complete");
