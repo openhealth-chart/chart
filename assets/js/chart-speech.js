@@ -42,7 +42,7 @@ export class ChartRecorder {
     if (this.stopButton) this.stopButton.disabled = true;
     this.currentTextarea = dictFields[0] || null;
 
-    if (this.startButton) this.startButton.addEventListener('click', () => this.startRecording());
+    if (this.startButton && this.apiKey) this.startButton.addEventListener('click', () => this.startRecording());
     if (this.stopButton) this.stopButton.addEventListener('click', () => this.stopRecording());
   }
 
